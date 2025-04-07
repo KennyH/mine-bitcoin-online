@@ -1,5 +1,10 @@
 resource "aws_s3_bucket" "frontend_bucket" {
   bucket = "mine-bitcoin-online-frontend-${var.environment}"
+
+  tags = {
+    Environment = var.environment
+    Project     = "MineBitcoinOnline"
+  }
 }
 
 resource "aws_s3_bucket_versioning" "frontend_bucket_versioning" {

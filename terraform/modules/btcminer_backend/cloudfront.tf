@@ -49,6 +49,11 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   }
 
   aliases = var.domain_name != "" ? [var.domain_name] : []
+
+  tags = {
+    Environment = var.environment
+    Project     = "MineBitcoinOnline"
+  }
 }
 
 resource "aws_acm_certificate" "cert" {
