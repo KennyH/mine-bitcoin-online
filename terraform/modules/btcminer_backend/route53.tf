@@ -21,6 +21,7 @@ resource "aws_route53_record" "cert_validation" {
 }
 
 resource "aws_acm_certificate_validation" "cert_validation" {
+  provider = aws.acm
   count = length(aws_acm_certificate.cert) > 0 ? 1 : 0
 
   certificate_arn         = aws_acm_certificate.cert[0].arn
