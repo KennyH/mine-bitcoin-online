@@ -13,8 +13,46 @@ on:
           - prod # maps to prod branch
 
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      TF_VAR_environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.4
+
+      - name: Terraform Init
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform plan
+
+      - name: Terraform Apply
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform apply -auto-approve
+
+  deploy-nextjs:
+    runs-on: ubuntu-latest
+    needs: terraform
 
     permissions:
       id-token: write
@@ -27,26 +65,30 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ github.ref_name == 'main' && 'dev' || github.ref_name }}-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
           aws-region: us-west-2
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - name: Setup Node.js (Latest LTS)
+        uses: actions/setup-node@v4
         with:
-          terraform_version: 1.7.4
+          node-version: 22
 
-      - name: Terraform Init
-        run: terraform init
-        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+      - name: Install dependencies
+        working-directory: src/website
+        run: npm ci
 
-      - name: Terraform Plan
-        env:
-          TF_VAR_environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
-        run: terraform plan
-        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+      - name: Build Next.js static site
+        working-directory: src/website
+        run: npm run build
 
-      - name: Terraform Apply
-        env:
-            TF_VAR_environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
-        run: terraform apply -auto-approve
-        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+      - name: Deploy to S3 bucket
+        run: |
+          aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
+
+      - name: Invalidate CloudFront Distribution
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Origins.Items[?contains(DomainName, 'mine-bitcoin-online-frontend-${{ inputs.environment }}')]].Id | [0]" \
+            --output text)
+
+          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
