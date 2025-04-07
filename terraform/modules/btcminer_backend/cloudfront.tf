@@ -46,9 +46,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     cloudfront_default_certificate = var.domain_name == "" ? true : false
     acm_certificate_arn            = var.domain_name != "" ? aws_acm_certificate.cert[0].arn : null
     ssl_support_method             = var.domain_name != "" ? "sni-only" : null
+    minimum_protocol_version       = var.domain_name != "" ? "TLSv1.2_2021" : "TLSv1"
   }
 
   aliases = var.domain_name != "" ? [var.domain_name] : []
+
+  comment = var.domain_name != "" ? "${var.environment} env for bitcoin browser miner site" : null
 
   tags = {
     Environment = var.environment
