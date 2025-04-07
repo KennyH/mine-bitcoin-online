@@ -4,7 +4,6 @@ variable "environment" {
 }
 
 variable "domain_name" {
-  description = "TODO make custom domain name"
+  description = "custom domain name for site"
   type        = string
-  default     = ""
 }
