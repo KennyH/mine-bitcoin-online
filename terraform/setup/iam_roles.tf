@@ -40,6 +40,7 @@ resource "aws_iam_policy" "github_actions_policy" {
           "ec2:*",
           "lambda:*",
           "cloudwatch:*",
+          "cloudfront:*",
           "s3:*",
           "dynamodb:*",
           "kms:*",
