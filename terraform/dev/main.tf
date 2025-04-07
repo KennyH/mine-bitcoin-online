@@ -5,4 +5,5 @@ provider "aws" {
 module "btcminer_backend" {
   source             = "../modules/btcminer_backend"
   environment        = var.environment
+  domain_name        = var.domain_name
 }
