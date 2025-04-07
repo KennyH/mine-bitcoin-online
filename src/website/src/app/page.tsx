@@ -20,7 +20,7 @@ export default function Home() {
             About the Project
           </h2>
           <p>
-            This is an innovative, educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It's like entering a lottery—you might win!
+            This is an innovative, educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It’s like entering a lottery—you might win!
           </p>
         </section>
 
@@ -30,8 +30,8 @@ export default function Home() {
           </h2>
           <ul className="list-disc list-inside space-y-2">
             <li>Your browser utilizes WebAssembly to attempt solving the current Bitcoin block.</li>
-            <li>The likelihood of success is very low—but it's possible!</li>
-            <li>If you successfully mine the block, you'll receive the full Bitcoin block reward and mining fees, minus a 5% administrative fee and any applicable tax withholdings.</li>
+            <li>The likelihood of success is very low—but it’s possible!</li>
+            <li>If you successfully mine the block, you’ll receive the full Bitcoin block reward and mining fees, minus a 5% administrative fee and any applicable tax withholdings.</li>
             <li>Successful miners will be directly contacted to facilitate the reward transfer.</li>
           </ul>
         </section>
