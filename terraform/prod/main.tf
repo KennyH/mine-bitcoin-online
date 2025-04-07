@@ -8,7 +8,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-module "siteup_backend" {
+module "btcminer_backend" {
   source             = "../modules/btcminer_backend"
   environment        = var.environment
   domain_name        = var.domain_name
