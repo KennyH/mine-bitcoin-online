@@ -22,6 +22,7 @@ jobs:
 
     env:
       TF_VAR_environment: ${{ inputs.environment }}
+      TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || '' }}
 
     steps:
       - name: Checkout Repo
