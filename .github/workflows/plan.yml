@@ -1,0 +1,47 @@
+name: Terraform Plan
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to plan'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev # maps to main branch
+          - prod # maps to prod branch
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    env:
+      TF_VAR_environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.4
+
+      - name: Terraform Init
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform plan

@@ -44,9 +44,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
   viewer_certificate {
     cloudfront_default_certificate = var.domain_name == "" ? true : false
-    acm_certificate_arn            = var.domain_name != "" ? aws_acm_certificate.cert[0].arn : null
-    ssl_support_method             = var.domain_name != "" ? "sni-only" : null
-    minimum_protocol_version       = var.domain_name != "" ? "TLSv1.2_2021" : "TLSv1"
+    acm_certificate_arn            = length(aws_acm_certificate.cert) > 0 ? aws_acm_certificate.cert[0].arn : null
+    ssl_support_method             = length(aws_acm_certificate.cert) > 0 ? "sni-only" : null
+    minimum_protocol_version       = length(aws_acm_certificate.cert) > 0 ? "TLSv1.2_2021" : "TLSv1"
   }
 
   aliases = var.domain_name != "" ? [var.domain_name] : []
