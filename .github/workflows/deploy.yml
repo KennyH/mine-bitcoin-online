@@ -81,6 +81,11 @@ jobs:
         working-directory: src/website
         run: npm run build
 
+      - name: Add robots.txt for dev environment
+        if: ${{ inputs.environment }} == 'dev'
+        run: |
+          echo -e "User-agent: *\nDisallow: /" > src/website/out/robots.txt
+
       - name: Deploy to S3 bucket
         run: |
           aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
