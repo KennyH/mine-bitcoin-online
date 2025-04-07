@@ -134,3 +134,17 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Terraform local state files and folders
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.backup
+.terraform.lock.hcl
+
+# Ignore Terraform crash log files
+crash.log
+
+# Ignore sensitive variable files
+*.tfvars
+*.tfvars.json
