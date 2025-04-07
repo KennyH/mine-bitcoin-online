@@ -82,10 +82,31 @@ jobs:
         working-directory: src/website
         run: npm run build
 
-      - name: Add robots.txt for dev environment
-        if: ${{ inputs.environment }} == 'dev'
+      - name: Adding extended robots.txt for dev environment
+        if: ${{ inputs.environment == 'dev' }}
         run: |
-          echo -e "User-agent: *\nDisallow: /" > src/website/out/robots.txt
+          cat << EOF > src/website/out/robots.txt
+          User-agent: *
+          Disallow: /
+
+          User-agent: GPTBot
+          Disallow: /
+
+          User-agent: ChatGPT-User
+          Disallow: /
+
+          User-agent: Googlebot
+          Disallow: /
+
+          User-agent: Bingbot
+          Disallow: /
+
+          User-agent: anthropic-ai
+          Disallow: /
+
+          User-agent: ClaudeBot
+          Disallow: /
+          EOF
 
       - name: Deploy to S3 bucket
         run: |
