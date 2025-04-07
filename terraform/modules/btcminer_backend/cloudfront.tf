@@ -60,6 +60,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 }
 
 resource "aws_acm_certificate" "cert" {
+  provider          = aws.acm
   count             = var.domain_name != "" ? 1 : 0
   domain_name       = var.domain_name
   validation_method = "DNS"
