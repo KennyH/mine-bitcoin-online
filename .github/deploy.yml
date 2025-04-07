@@ -1,0 +1,52 @@
+name: Deploy Terraform to AWS
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev # maps to main branch
+          - prod # maps to prod branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ github.ref_name == 'main' && 'dev' || github.ref_name }}-role
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.4
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+
+      - name: Terraform Plan
+        env:
+          TF_VAR_environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+        run: terraform plan
+        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+
+      - name: Terraform Apply
+        env:
+            TF_VAR_environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+        run: terraform apply -auto-approve
+        working-directory: terraform/${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
