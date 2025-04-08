@@ -12,7 +12,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client_local_dev" {
 
   supported_identity_providers = ["COGNITO"]
 
-  allowed_oauth_flows = ["code", "implicit"]
+  allowed_oauth_flows = ["code"]
 
   allowed_oauth_scopes = [
     "email",

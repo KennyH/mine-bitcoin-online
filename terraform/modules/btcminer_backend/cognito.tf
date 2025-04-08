@@ -8,6 +8,11 @@ resource "aws_cognito_user_pool" "user_pool" {
     enabled = true
   }
 
+  device_configuration {
+    device_only_remembered_on_user_prompt = true
+    challenge_required_on_new_device      = true
+  }
+
   auto_verified_attributes = ["email"]
 
   username_attributes = ["email"]
@@ -43,7 +48,7 @@ resource "aws_cognito_user_pool" "user_pool" {
 resource "aws_cognito_user_pool_client" "user_pool_client" {
   name                         = "minebitcoinonline-user-pool-client-${var.environment}"
   user_pool_id                 = aws_cognito_user_pool.user_pool.id
-  generate_secret              = false
+  generate_secret              = false # The frontend site should never have a client secret because it is public.
   allowed_oauth_flows_user_pool_client = true
 
   explicit_auth_flows = [
@@ -53,7 +58,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
 
   supported_identity_providers = ["COGNITO"]
 
-  allowed_oauth_flows = ["code", "implicit"]
+  allowed_oauth_flows = ["code"]
 
   allowed_oauth_scopes = [
     "email",
