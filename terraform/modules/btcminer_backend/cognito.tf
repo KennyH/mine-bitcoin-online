@@ -66,7 +66,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
     "profile"
   ]
 
-  callback_urls = ["https://${var.domain_name}/api/auth/callback/cognito"]
+  callback_urls = ["https://${var.domain_name}"]
   logout_urls   = ["https://${var.domain_name}"]
 
   prevent_user_existence_errors = "ENABLED"

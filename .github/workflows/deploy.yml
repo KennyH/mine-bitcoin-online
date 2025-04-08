@@ -88,11 +88,10 @@ jobs:
       - name: Build Next.js static site
         working-directory: src/website
         env:
-          NEXTAUTH_URL: ${{ secrets[format('{0}_NEXTAUTH_URL', steps.vars.outputs.env_upper)] }}
-          NEXTAUTH_SECRET: ${{ secrets[format('{0}_NEXTAUTH_SECRET', steps.vars.outputs.env_upper)] }}
-          COGNITO_CLIENT_ID: ${{ secrets[format('{0}_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
-          COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
-          COGNITO_DOMAIN: ${{ secrets[format('{0}_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_NEXTAUTH_URL: ${{ secrets[format('{0}_NEXT_PUBLIC_NEXTAUTH_URL', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
         run: npm run build
 
       - name: Adding extended robots.txt for dev environment

@@ -1,10 +1,22 @@
 'use client';
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useEffect, useState } from 'react';
+import { signInWithRedirect, signOut, getCurrentUser } from 'aws-amplify/auth';
+
 
 export default function Home() {
-  const { data: session, status } = useSession();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+  useEffect(() => {
+    getCurrentUser()
+      .then((currentUser) => setUser(currentUser))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="text-center py-20">Loading...</div>;
+  }
 
   return (
     <div className="bg-[#121212] text-white font-inter min-h-screen pb-20">
@@ -23,24 +35,24 @@ export default function Home() {
 
       <main className="max-w-3xl mx-auto py-12 px-4 space-y-8">
         <section className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-          {!session && (
+          {!user && (
             <div>
               <p className="mb-4">You are not logged in.</p>
               <button
                 className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => signIn("cognito")}
+                onClick={() => signInWithRedirect()}
               >
                 Log in
               </button>
             </div>
           )}
 
-          {session && (
+          {user && (
             <div>
-              <p className="mb-4">Signed in as {session.user?.email}</p>
+              <p className="mb-4">Signed in as {user.signInDetails?.loginId}</p>
               <button
                 className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => signOut()}
+                onClick={() => signOut().then(() => setUser(null))}
               >
                 Logout
               </button>

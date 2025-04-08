@@ -20,7 +20,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client_local_dev" {
     "profile"
   ]
 
-  callback_urls = ["http://localhost:3000/api/auth/callback/cognito"]
+  callback_urls = ["http://localhost:3000"]
   logout_urls   = ["http://localhost:3000"]
 
   prevent_user_existence_errors = "ENABLED"
