@@ -8,4 +8,5 @@ variable "domain_name" {
 
 variable "aws_region" {
   type    = string
+  default = "us-west-2"
 }
