@@ -1,15 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { signInWithRedirect, signOut, getCurrentUser } from 'aws-amplify/auth';
+import { signInWithRedirect, signOut, getCurrentUser, type AuthUser } from 'aws-amplify/auth';
 
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCurrentUser()
-      .then((currentUser) => setUser(currentUser))
+      .then((currentUser: AuthUser) => setUser(currentUser))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
