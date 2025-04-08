@@ -3,5 +3,9 @@ variable "environment" {
 }
 
 variable "domain_name" {
-  type    = string
+  type = string
+}
+
+variable "aws_region" {
+  type = string
 }

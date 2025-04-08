@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     bucket         = "mine-bitcoin-online-terraform-state"
     key            = "dev/terraform.tfstate"
-    region         = "us-west-2"
+    region         = var.aws_region
     dynamodb_table = "mine-bitcoin-online-terraform-state-lock"
     encrypt        = true
   }
