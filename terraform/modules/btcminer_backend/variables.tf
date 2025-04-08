@@ -9,5 +9,7 @@ variable "domain_name" {
 }
 
 variable "aws_region" {
-  type = string
+  description = "aws region for site and services"
+  type    = string
+  default = "us-west-2"
 }
