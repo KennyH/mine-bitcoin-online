@@ -68,6 +68,13 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
           aws-region: us-west-2
+      
+      - name: Set uppercase environment variable
+        id: vars
+        run: |
+          env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
+          echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
+          echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node.js (Latest LTS)
         uses: actions/setup-node@v4
@@ -80,6 +87,12 @@ jobs:
 
       - name: Build Next.js static site
         working-directory: src/website
+        env:
+          NEXTAUTH_URL: ${{ secrets[format('{0}_NEXTAUTH_URL', steps.vars.outputs.env_upper)] }}
+          NEXTAUTH_SECRET: ${{ secrets[format('{0}_NEXTAUTH_SECRET', steps.vars.outputs.env_upper)] }}
+          COGNITO_CLIENT_ID: ${{ secrets[format('{0}_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
+          COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
+          COGNITO_DOMAIN: ${{ secrets[format('{0}_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
         run: npm run build
 
       - name: Adding extended robots.txt for dev environment

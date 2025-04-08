@@ -1,6 +1,13 @@
+'use client';
+import { useSession, signIn, signOut } from "next-auth/react";
+
 export default function Home() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") return <div className="text-center py-20">Loading...</div>;
+
   return (
-    <div className="bg-[#121212] text-white font-inter min-h-screen">
+    <div className="bg-[#121212] text-white font-inter min-h-screen pb-20">
       <header className="bg-gradient-to-r from-orange-500 to-pink-600 text-center py-16 px-4">
         <h1 className="text-5xl font-bold">Bitcoin Browser Miner</h1>
         <p className="text-xl opacity-90 mt-2">
@@ -15,6 +22,32 @@ export default function Home() {
       </nav>
 
       <main className="max-w-3xl mx-auto py-12 px-4 space-y-8">
+        <section className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
+          {!session && (
+            <div>
+              <p className="mb-4">You are not logged in.</p>
+              <button
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => signIn("cognito")}
+              >
+                Log in
+              </button>
+            </div>
+          )}
+
+          {session && (
+            <div>
+              <p className="mb-4">Signed in as {session.user?.email}</p>
+              <button
+                className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => signOut()}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </section>
+
         <section id="about" className="bg-gray-800 rounded-lg shadow-lg p-6">
           <h2 className="text-orange-500 text-2xl border-b-2 border-orange-500 inline-block mb-4">
             About the Project
