@@ -34,7 +34,7 @@ resource "aws_cognito_user_pool" "user_pool" {
   schema {
     name                = "tos_accepted"
     attribute_data_type = "Boolean"
-    required            = true
+    required            = false # need to have UI enforce this..
     mutable             = false
   }
 }
