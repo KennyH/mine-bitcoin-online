@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { signInWithRedirect, signOut, getCurrentUser, fetchAuthSession, type AuthUser, signIn } from 'aws-amplify/auth';
+import { signInWithRedirect, signOut, getCurrentUser, fetchAuthSession, type AuthUser } from 'aws-amplify/auth';
 
 interface AmplifyAuthContextProps {
     user: AuthUser | null;
