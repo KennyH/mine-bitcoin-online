@@ -43,8 +43,9 @@ resource "aws_cognito_user_pool" "user_pool" {
     email_sending_account = "COGNITO_DEFAULT"
   }
 
+  # have to include password, even though it should never be used..
   sign_in_policy {
-    allowed_first_auth_factors = ["EMAIL_OTP"]
+    allowed_first_auth_factors = ["EMAIL_OTP", "PASSWORD"]
   }
 
   device_configuration {
