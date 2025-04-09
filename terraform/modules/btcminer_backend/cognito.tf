@@ -16,9 +16,9 @@ resource "aws_cognito_user_pool" "user_pool" {
   auto_verified_attributes = ["email"]
   username_attributes      = ["email"]
 
-  sign_in_policy {
-    allowed_first_auth_factors = ["EMAIL_OTP"]
-  }
+  # sign_in_policy {
+  #   allowed_first_auth_factors = ["EMAIL_OTP"]
+  # }
 
   schema {
     name                = "email"
@@ -34,7 +34,7 @@ resource "aws_cognito_user_pool" "user_pool" {
   schema {
     name                = "name"
     attribute_data_type = "String"
-    required            = true
+    required            = false
     mutable             = true
     string_attribute_constraints {
       min_length = 1
@@ -62,6 +62,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
   name                         = "minebitcoinonline-user-pool-client-${var.environment}"
   user_pool_id                 = aws_cognito_user_pool.user_pool.id
   generate_secret              = false # The frontend site should never have a client secret because it is public.
+  
   allowed_oauth_flows_user_pool_client = true
 
   explicit_auth_flows = [
