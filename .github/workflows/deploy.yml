@@ -42,6 +42,11 @@ jobs:
       - name: Terraform Init
         working-directory: terraform/${{ inputs.environment }}
         run: terraform init
+      
+      # TEMP: Destroy the Cognito User Pool resource
+      - name: Terraform Destroy Cognito User Pool (TEMPORARY)
+        working-directory: terraform/${{ inputs.environment }}
+        run: terraform destroy -auto-approve -target=module.btcminer_backend.aws_cognito_user_pool.user_pool
 
       - name: Terraform Plan
         working-directory: terraform/${{ inputs.environment }}
