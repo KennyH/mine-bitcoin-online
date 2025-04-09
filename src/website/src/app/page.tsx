@@ -1,43 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { signInWithRedirect, signOut, getCurrentUser, fetchAuthSession, type AuthUser } from 'aws-amplify/auth';
-
-// interface UserAttributes {
-//   email?: string;
-//   sub?: string;
-//   'custom:favorite_color'?: string;
-//   // Add other attributes as needed
-// }
-
-// async function getUserAttributes() {
-//   try {
-//     const attributes = await fetchUserAttributes() as UserAttributes;
-//     console.log('User attributes:', attributes);
-//   } catch (error) {
-//     console.error('Error fetching user attributes:', error);
-//   }
-// }
+import { useAuth } from './context/AmplifyAuthContext';
 
 export default function Home() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [email, setEmail] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getCurrentUser()
-      .then(async (currentUser: AuthUser) => {
-        setUser(currentUser);
-        const session = await fetchAuthSession();
-        const idTokenPayload = session.tokens?.idToken?.payload;
-        const email = idTokenPayload?.email;
-        setEmail(typeof email === 'string' ? email : null);
-      })
-      .catch(() => {
-        setUser(null);
-        setEmail(null);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const { user, email, loading, login, logout } = useAuth();
 
   if (loading) {
     return <div className="text-center py-20">Loading...</div>;
@@ -65,7 +30,7 @@ export default function Home() {
               <p className="mb-4">You are not logged in.</p>
               <button
                 className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => signInWithRedirect()}
+                onClick={login}
               >
                 Log in
               </button>
@@ -77,7 +42,7 @@ export default function Home() {
               <p className="mb-4">Signed in as {email}</p>
               <button
                 className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-                onClick={() => signOut().then(() => setUser(null))}
+                onClick={logout}
               >
                 Logout
               </button>

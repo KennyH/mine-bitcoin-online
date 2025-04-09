@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import AmplifyConfig from "./AmplifyConfig";
+import { AmplifyAuthProvider } from "./context/AmplifyAuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,7 +16,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" className="min-h-screen">
       <body className={`${inter.className} min-h-screen flex flex-col`}>
         <AmplifyConfig />
-        {children}
+        <AmplifyAuthProvider>{children}</AmplifyAuthProvider>
       </body>
     </html>
   );
