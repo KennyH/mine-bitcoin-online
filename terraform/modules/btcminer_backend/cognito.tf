@@ -9,12 +9,16 @@ resource "aws_cognito_user_pool" "user_pool" {
 #   }
 
   device_configuration {
-    device_only_remembered_on_user_prompt = true
-    challenge_required_on_new_device      = true
+    device_only_remembered_on_user_prompt = false
+    challenge_required_on_new_device      = false
   }
 
   auto_verified_attributes = ["email"]
   username_attributes      = ["email"]
+
+  sign_in_policy {
+    allowed_first_auth_factors = ["EMAIL_OTP"]
+  }
 
 #   password_policy {
 #     minimum_length    = 8
@@ -56,6 +60,9 @@ resource "aws_cognito_user_pool" "user_pool" {
   email_configuration {
     email_sending_account = "COGNITO_DEFAULT"
   }
+
+  deletion_protection = var.environment == "prod" ? "ACTIVE" : "INACTIVE"
+
 }
 
 # Cognito User Pool Client
