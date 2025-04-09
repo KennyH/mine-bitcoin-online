@@ -5,3 +5,7 @@ Our new library of quick-setup code examples has tools to build a new applicatio
 Your user pool can now host an attractive updated UX with the brand new managed login experience.
 You can now style and customize managed login pages with a new visual branding designer.
 Your applications can now support passkeys and passwordless user sign-in with one-time passwords.
+
+
+Cognito prefix domain
+us-west-2csx4spgeb.auth.us-west-2.amazoncognito.com
