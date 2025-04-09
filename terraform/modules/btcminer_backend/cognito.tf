@@ -20,14 +20,6 @@ resource "aws_cognito_user_pool" "user_pool" {
     allowed_first_auth_factors = ["EMAIL_OTP"]
   }
 
-#   password_policy {
-#     minimum_length    = 8
-#     require_lowercase = true
-#     require_numbers   = true
-#     require_uppercase = true
-#     require_symbols   = true
-#   }
-
   schema {
     name                = "email"
     attribute_data_type = "String"
