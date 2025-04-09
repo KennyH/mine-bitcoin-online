@@ -1,104 +1,111 @@
-# # Cognito User Pool
-# resource "aws_cognito_user_pool" "user_pool" {
-#   name = "minebitcoinonline-user-pool-${var.environment}"
+# Cognito User Pool with Passwordless Email OTP
+resource "aws_cognito_user_pool" "user_pool" {
+  name = "minebitcoinonline-user-pool-${var.environment}"
 
-#   mfa_configuration = "OFF"
+  auto_verified_attributes = ["email"]
+  username_attributes      = ["email"]
+  mfa_configuration        = "OFF"
 
-# #   software_token_mfa_configuration {
-# #     enabled = true
-# #   }
+  schema {
+    name                = "email"
+    attribute_data_type = "String"
+    required            = true
+    mutable             = false
 
-#   device_configuration {
-#     device_only_remembered_on_user_prompt = false
-#     challenge_required_on_new_device      = false
-#   }
+    string_attribute_constraints {
+      min_length = 5
+      max_length = 254
+    }
+  }
 
-#   auto_verified_attributes = ["email"]
-#   username_attributes      = ["email"]
+  schema {
+    name                = "name"
+    attribute_data_type = "String"
+    required            = false
+    mutable             = true
 
-#   # sign_in_policy {
-#   #   allowed_first_auth_factors = ["EMAIL_OTP"]
-#   # }
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 128
+    }
+  }
 
-#   schema {
-#     name                = "email"
-#     attribute_data_type = "String"
-#     required            = true
-#     mutable             = false
-#     string_attribute_constraints {
-#       min_length = 5
-#       max_length = 254
-#     }
-#   }
+  schema {
+    name                = "tos_accepted"
+    attribute_data_type = "Boolean"
+    required            = false
+    mutable             = false
+  }
 
-#   schema {
-#     name                = "name"
-#     attribute_data_type = "String"
-#     required            = false
-#     mutable             = true
-#     string_attribute_constraints {
-#       min_length = 1
-#       max_length = 128
-#     }
-#   }
+  deletion_protection = var.environment == "prod" ? "ACTIVE" : "INACTIVE"
 
-#   schema {
-#     name                = "tos_accepted"
-#     attribute_data_type = "Boolean"
-#     required            = false # need to have UI enforce this..
-#     mutable             = false
-#   }
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
+  }
 
-#   email_configuration {
-#     email_sending_account = "COGNITO_DEFAULT"
-#   }
+  sign_in_policy {
+    allowed_first_auth_factors = ["EMAIL_OTP"]
+  }
 
-#   deletion_protection = var.environment == "prod" ? "ACTIVE" : "INACTIVE"
+  device_configuration {
+    challenge_required_on_new_device      = false
+    device_only_remembered_on_user_prompt = false
+  }
 
-# }
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 
-# # Cognito User Pool Client
-# resource "aws_cognito_user_pool_client" "user_pool_client" {
-#   name                         = "minebitcoinonline-user-pool-client-${var.environment}"
-#   user_pool_id                 = aws_cognito_user_pool.user_pool.id
-#   generate_secret              = false # The frontend site should never have a client secret because it is public.
-  
-#   allowed_oauth_flows_user_pool_client = true
+  verification_message_template {
+    default_email_option = "CONFIRM_WITH_CODE"
 
-#   explicit_auth_flows = [
-#     "ALLOW_REFRESH_TOKEN_AUTH"
-#   ]
+    email_subject = "Your Bitcoin Browser Miner Login Code"
 
-#   supported_identity_providers = ["COGNITO"]
+    email_message = <<-EOM
+      Your verification code is: {####}
 
-#   allowed_oauth_flows = ["code"]
+      Use this code to log in to https://${var.domain_name}.
 
-#   allowed_oauth_scopes = [
-#     "email",
-#     "openid",
-#     "profile"
-#   ]
+      If you did not request this code, please ignore this email.
+    EOM
+  }
+}
 
-#   callback_urls = ["https://${var.domain_name}"]
-#   logout_urls   = ["https://${var.domain_name}"]
 
-#   prevent_user_existence_errors = "ENABLED"
-# }
+# Cognito User Pool Client (Passwordless)
+resource "aws_cognito_user_pool_client" "user_pool_client" {
+  name                 = "minebitcoinonline-user-pool-client-${var.environment}"
+  user_pool_id         = aws_cognito_user_pool.user_pool.id
+  generate_secret      = false
 
-# # Cognito User Pool Domain
-# resource "aws_cognito_user_pool_domain" "user_pool_domain" {
-#   domain       = "${var.environment}-bitcoin-miner-auth"
-#   user_pool_id = aws_cognito_user_pool.user_pool.id
-# }
+  explicit_auth_flows = [
+    "ALLOW_CUSTOM_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH"
+  ]
 
-# output "cognito_user_pool_id" {
-#   value = aws_cognito_user_pool.user_pool.id
-# }
+  supported_identity_providers = ["COGNITO"]
 
-# output "cognito_user_pool_client_id" {
-#   value = aws_cognito_user_pool_client.user_pool_client.id
-# }
+  prevent_user_existence_errors = "ENABLED"
 
-# output "cognito_domain_url" {
-#   value = "https://${aws_cognito_user_pool_domain.user_pool_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
-# }
+  allowed_oauth_flows_user_pool_client = false
+}
+
+resource "aws_cognito_user_pool_domain" "user_pool_domain" {
+  domain       = "${var.environment}-bitcoin-miner-auth"
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+}
+
+output "cognito_user_pool_id" {
+  value = aws_cognito_user_pool.user_pool.id
+}
+
+output "cognito_user_pool_client_id" {
+  value = aws_cognito_user_pool_client.user_pool_client.id
+}
+
+output "cognito_domain_url" {
+  value = "https://${aws_cognito_user_pool_domain.user_pool_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
+}
