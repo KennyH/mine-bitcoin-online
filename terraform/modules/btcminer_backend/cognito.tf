@@ -2,11 +2,11 @@
 resource "aws_cognito_user_pool" "user_pool" {
   name = "minebitcoinonline-user-pool-${var.environment}"
 
-  mfa_configuration = "ON"
+  mfa_configuration = "OFF"
 
-  software_token_mfa_configuration {
-    enabled = true
-  }
+#   software_token_mfa_configuration {
+#     enabled = true
+#   }
 
   device_configuration {
     device_only_remembered_on_user_prompt = true
@@ -14,25 +14,35 @@ resource "aws_cognito_user_pool" "user_pool" {
   }
 
   auto_verified_attributes = ["email"]
+  username_attributes      = ["email"]
 
-  username_attributes = ["email"]
-
-  password_policy {
-    minimum_length    = 8
-    require_lowercase = true
-    require_numbers   = true
-    require_uppercase = true
-    require_symbols   = true
-  }
+#   password_policy {
+#     minimum_length    = 8
+#     require_lowercase = true
+#     require_numbers   = true
+#     require_uppercase = true
+#     require_symbols   = true
+#   }
 
   schema {
-    name                     = "email"
-    required                 = true
-    mutable                  = false
-    attribute_data_type      = "String"
+    name                = "name"
+    attribute_data_type = "String"
+    required            = true
+    mutable             = false
     string_attribute_constraints {
       min_length = 5
       max_length = 254
+    }
+  }
+
+  schema {
+    name                = "name"
+    attribute_data_type = "String"
+    required            = true
+    mutable             = true
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 128
     }
   }
 
@@ -41,6 +51,10 @@ resource "aws_cognito_user_pool" "user_pool" {
     attribute_data_type = "Boolean"
     required            = false # need to have UI enforce this..
     mutable             = false
+  }
+
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
   }
 }
 
@@ -52,7 +66,7 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
   allowed_oauth_flows_user_pool_client = true
 
   explicit_auth_flows = [
-    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_USER_SRP_AUTH",
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
 
