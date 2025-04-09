@@ -10,7 +10,7 @@ resource "aws_cloudformation_stack" "cognito_user_pool_override" {
         "UserPoolName": "${aws_cognito_user_pool.user_pool.name}",
         "Policies": {
           "SignInPolicy": {
-            "AllowedFirstAuthFactors": ["EMAIL_OTP"]
+            "AllowedFirstAuthFactors": ["EMAIL_OTP", "PASSWORD"]
           }
         },
         "UsernameAttributes": ["email"],
