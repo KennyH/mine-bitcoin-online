@@ -1,16 +1,41 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { signInWithRedirect, signOut, getCurrentUser, type AuthUser } from 'aws-amplify/auth';
+import { signInWithRedirect, signOut, getCurrentUser, fetchAuthSession, type AuthUser } from 'aws-amplify/auth';
 
+// interface UserAttributes {
+//   email?: string;
+//   sub?: string;
+//   'custom:favorite_color'?: string;
+//   // Add other attributes as needed
+// }
+
+// async function getUserAttributes() {
+//   try {
+//     const attributes = await fetchUserAttributes() as UserAttributes;
+//     console.log('User attributes:', attributes);
+//   } catch (error) {
+//     console.error('Error fetching user attributes:', error);
+//   }
+// }
 
 export default function Home() {
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getCurrentUser()
-      .then((currentUser: AuthUser) => setUser(currentUser))
-      .catch(() => setUser(null))
+      .then(async (currentUser: AuthUser) => {
+        setUser(currentUser);
+        const session = await fetchAuthSession();
+        const idTokenPayload = session.tokens?.idToken?.payload;
+        const email = idTokenPayload?.email;
+        setEmail(typeof email === 'string' ? email : null);
+      })
+      .catch(() => {
+        setUser(null);
+        setEmail(null);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -49,7 +74,7 @@ export default function Home() {
 
           {user && (
             <div>
-              <p className="mb-4">Signed in as {user.signInDetails?.loginId}</p>
+              <p className="mb-4">Signed in as {email}</p>
               <button
                 className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
                 onClick={() => signOut().then(() => setUser(null))}
