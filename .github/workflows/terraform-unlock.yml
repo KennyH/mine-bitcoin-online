@@ -38,9 +38,9 @@ jobs:
           terraform_version: 1.7.4
 
       - name: Terraform Init
-        working-directory: terraform/${{ inputs.environment }}
+        working-directory: src/backend/terraform/${{ inputs.environment }}
         run: terraform init
 
       - name: Terraform Force Unlock
-        working-directory: terraform/${{ inputs.environment }}
+        working-directory: src/backend/terraform/${{ inputs.environment }}
         run: terraform force-unlock -force ${{ inputs.lock_id }}
