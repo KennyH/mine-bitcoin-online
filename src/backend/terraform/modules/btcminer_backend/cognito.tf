@@ -87,11 +87,19 @@ resource "aws_cognito_user_pool_client" "user_pool_client" {
     "ALLOW_REFRESH_TOKEN_AUTH"
   ]
 
-  supported_identity_providers = ["COGNITO"]
-
-  prevent_user_existence_errors = "ENABLED"
-
+  supported_identity_providers         = ["COGNITO"]
+  prevent_user_existence_errors        = "ENABLED"
   allowed_oauth_flows_user_pool_client = false
+
+  access_token_validity  = 60
+  id_token_validity      = 60
+  refresh_token_validity = 30
+
+  token_validity_units {
+    access_token  = "minutes"
+    id_token      = "minutes"
+    refresh_token = "days"
+  }
 }
 
 resource "aws_cognito_user_pool_domain" "user_pool_domain" {
