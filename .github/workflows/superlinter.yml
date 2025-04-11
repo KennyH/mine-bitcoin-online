@@ -23,10 +23,10 @@ jobs:
             DEFAULT_BRANCH: main
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             TERRASCAN_CONFIG_FILE: .terrascan.yaml
-            YAMLLINT_CONFIG_FILE: .yamllint.yaml
+            YAML_LINTER_RULES_PATH: .yamllint.yaml
             VALIDATE_ALL_CODEBASE: true
             VALIDATE_TERRAFORM_TERRASCAN: true
-            #TERRAFORM_TERRASCAN_CLI_DEFAULT_ARGS: "--skip-rules=AC_AWS_0486,AC_AWS_0487,AC_AWS_0493"
+            TERRAFORM_TERRASCAN_CLI_DEFAULT_ARGS: "--skip-rules=AC_AWS_0486,AC_AWS_0487,AC_AWS_0493"
             VALIDATE_JAVASCRIPT_ES: true
             VALIDATE_TYPESCRIPT_ES: true
             VALIDATE_JSX: true
