@@ -20,7 +20,7 @@ jobs:
         with:
           entrypoint: /action/lib/linter.sh
         env:
-          RUN_LOCAL: 'true'
+          RUN_LOCAL: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_ES: true
@@ -42,8 +42,9 @@ jobs:
       - name: Run Terrascan scan
         uses: tenable/terrascan-action@v1.4.1
         with:
-          iac_type: 'terraform'
-          iac_version: 'v14'
-          policy_type: 'aws'
-          iac_dir: 'src/backend/terraform'
-          skip_rules: 'AC_AWS_0032,AC_AWS_0026,AC_AWS_0025'
+          iac_type: terraform
+          iac_version: v14
+          policy_type: aws
+          iac_dir: src/backend/terraform
+          config_path: ./.github/linters/.terrascan.yaml
+          #skip_rules: 'AC_AWS_0032,AC_AWS_0026,AC_AWS_0025'
