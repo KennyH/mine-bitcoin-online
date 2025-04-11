@@ -1,0 +1,6 @@
+policy:
+  skip:
+    - AC_AWS_0486 # skip geo restriction; try to keep it worldwide for now
+    - AC_AWS_0487 # skip logging; too costly
+    - AC_AWS_0493 # skip WAF; too costly for now
+

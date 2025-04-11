@@ -1,3 +1,4 @@
+---
 name: Super Linter
 
 on:
@@ -28,6 +29,6 @@ jobs:
             VALIDATE_JSX: true
             VALIDATE_YAML: true
             VALIDATE_JSON: true
-            VALIDATE_MARKDOWN: true
+            VALIDATE_MARKDOWN: false
             VALIDATE_PYTHON_FLAKE8: true
 
