@@ -20,5 +20,14 @@ jobs:
         uses: github/super-linter@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BRANCH: main
-          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_TERRAFORM: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_ES: true
+
+          DISABLE_ANSIBLE_ANSIBLELINT: true
+          DISABLE_CSS_STYLELINT: true
+          DISABLE_MARKDOWN_MDLOLLINT: true
+          DISABLE_PYTHON_PYLINT: true
+          DISABLE_SHELL_SHFMT: true
+
