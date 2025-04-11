@@ -2,9 +2,11 @@ resource "aws_cloudfront_origin_access_identity" "origin_identity" {
   comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
 }
 
-#ts:skip=AC_AWS_0493 Ensure CloudFront has WAF enabled (cost issue)
-#ts:skip=AC_AWS_0486 Ensure geo restriction is enabled (business decision)
-#ts:skip=AC_AWS_0487 Ensure logging is enabled (cost issue)
+# https://github.com/tenable/terrascan/blob/master/docs/policies/aws.md
+
+#ts:skip=AC_AWS_0032 Ensure CloudFront has WAF enabled (cost issue)
+#ts:skip=AC_AWS_0026 Ensure geo restriction is enabled (business decision)
+#ts:skip=AC_AWS_0025 Ensure logging is enabled (cost issue)
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name

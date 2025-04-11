@@ -1,6 +1,6 @@
 ---
 policy:
   skip:
-    - AC_AWS_0486  # skip geo restriction
-    - AC_AWS_0487  # skip logging
-    - AC_AWS_0493  # skip WAF
+    - AC_AWS_0032  # skip WAF
+    - AC_AWS_0026  # skip geo restriction
+    - AC_AWS_0025  # skip logging
