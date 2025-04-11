@@ -19,15 +19,15 @@ jobs:
       - name: Run Super Linter
         uses: github/super-linter@v4
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_TERRAFORM: true
-          VALIDATE_JAVASCRIPT_ES: true
-          VALIDATE_TYPESCRIPT_ES: true
-
-          DISABLE_ANSIBLE_ANSIBLELINT: true
-          DISABLE_CSS_STYLELINT: true
-          DISABLE_MARKDOWN_MDLOLLINT: true
-          DISABLE_PYTHON_PYLINT: true
-          DISABLE_SHELL_SHFMT: true
+            VALIDATE_ALL_CODEBASE: false
+            DEFAULT_BRANCH: main
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            VALIDATE_TERRAFORM_TERRASCAN: true
+            VALIDATE_JAVASCRIPT_ES: true
+            VALIDATE_TYPESCRIPT_ES: true
+            VALIDATE_JSX: true
+            VALIDATE_YAML: true
+            VALIDATE_JSON: true
+            VALIDATE_MARKDOWN: true
+            VALIDATE_PYTHON_FLAKE8: true
 
