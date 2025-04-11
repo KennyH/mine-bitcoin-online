@@ -36,14 +36,25 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Run Terrascan scan
+      # 1
+      - name: Install Terrascan CLI
+        run: |
+          echo "Installing Terrascan..."
+          curl -L https://raw.githubusercontent.com/tenable/terrascan/master/scripts/install.sh | sh
+          terrascan version
+          echo "Terrascan installed!"
+
+      # 2
+      - name: Show all policy IDs
+        run: terrascan scan --show-policies
+
+      # 3
+      - name: Run Terrascan Action
         uses: tenable/terrascan-action@v1.4.1
         with:
-          iac_type: 'terraform'
-          iac_version: 'v14'
-          policy_type: 'aws'
-          iac_dir: 'src/backend/terraform'
+          iac_type: terraform
+          iac_version: v14
+          policy_type: aws
+          iac_dir: src/backend/terraform
           skip_rules: 'AC_AWS_0486,AC_AWS_0487,AC_AWS_0493'
