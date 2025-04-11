@@ -1,0 +1,48 @@
+name: Lint and Terrascan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  super-linter:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      statuses: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Super Linter (slim-latest)
+        uses: docker://ghcr.io/github/super-linter:slim-latest
+        with:
+          entrypoint: /action/lib/linter.sh
+        env:
+          RUN_LOCAL: "true"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_JSX: true
+          VALIDATE_YAML: true
+          VALIDATE_JSON: true
+          VALIDATE_PYTHON_FLAKE8: true
+          YAML_LINTER_RULES_PATH: ./.github/linters/.yamllint.yaml
+
+  terrascan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Terrascan scan
+        uses: tenable/terrascan-action@v1.4.1
+        with:
+          iac_type: 'terraform'
+          iac_version: 'v14'
+          policy_type: 'aws'
+          policy_path: ./.github/linters/.terrascan.yaml
