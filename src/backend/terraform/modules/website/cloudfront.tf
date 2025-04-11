@@ -55,7 +55,7 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
 
   tags = {
     Environment = var.environment
-    Project     = "MineBitcoinOnline"
+    Project     = var.project_name
   }
 }
 

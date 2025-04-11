@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "frontend_bucket" {
 
   tags = {
     Environment = var.environment
-    Project     = "MineBitcoinOnline"
+    Project     = var.project_name
   }
 }
 

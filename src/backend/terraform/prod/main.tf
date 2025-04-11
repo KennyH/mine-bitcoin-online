@@ -8,11 +8,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
-module "btcminer_backend" {
-  source             = "../modules/btcminer_backend"
+module "website" {
+  source             = "../modules/website"
   environment        = var.environment
   domain_name        = var.domain_name
   aws_region         = var.aws_region
+  project_name       = var.project_name
 
   providers = {
     aws.acm = aws.useast1

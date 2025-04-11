@@ -4,16 +4,16 @@
 
 ```
 mine-bitcoin-online/
-├── .github/                 # actions for deployment
+├── .github/
 ├── package.json
 ├── src/
-│   ├── backend/
+│   ├── backend/             # backend IaC
 │   │   ├── lambdas/
 │   │   └── terraform/
 │   │       ├── dev/
-│   │       ├── modules/     # backend IaC
+│   │       ├── modules/
 │   │       ├── prod/
-│   │       └── setup/       # setup for Terraform state
+│   │       └── setup/       # for setting up Terraform state
 │   │
 │   ├── wasm-miner/          # WASM mining module src
 │   │   ├── Cargo.toml

@@ -1,5 +1,5 @@
 data "aws_route53_zone" "main" {
-  name         = "bitcoinbrowserminer.com"
+  name         = var.aws_route53_zone_name
   private_zone = false
 }
 
