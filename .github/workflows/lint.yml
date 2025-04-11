@@ -20,7 +20,7 @@ jobs:
         with:
           entrypoint: /action/lib/linter.sh
         env:
-          RUN_LOCAL: "true"
+          RUN_LOCAL: 'true'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_ES: true
@@ -45,4 +45,5 @@ jobs:
           iac_type: 'terraform'
           iac_version: 'v14'
           policy_type: 'aws'
-          policy_path: ./.github/linters/.terrascan.yaml
+          iac_dir: 'src/backend/terraform'
+          config_path: ./.github/linters/.terrascan.yaml
