@@ -18,12 +18,15 @@ jobs:
           fetch-depth: 0
 
       - name: Run Super Linter
-        uses: github/super-linter@v4
+        uses: docker://ghcr.io/github/super-linter:slim-latest
+        with:
+          entrypoint: /action/lib/linter.sh
         env:
             DEFAULT_BRANCH: main
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             LINTER_RULES_PATH: ./.github/linters
             TERRAFORM_TERRASCAN_CONFIG_FILE: .terrascan.toml
+            YAML_LINTER_RULES_PATH: ./.github/linters/.yamllint.yaml
             VALIDATE_ALL_CODEBASE: true
             VALIDATE_TERRAFORM_TERRASCAN: true
             VALIDATE_JAVASCRIPT_ES: true
