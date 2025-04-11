@@ -46,5 +46,5 @@ jobs:
           iac_version: v14
           policy_type: aws
           iac_dir: src/backend/terraform
-          config_path: ./.github/linters/.terrascan.yaml
-          #skip_rules: 'AC_AWS_0032,AC_AWS_0026,AC_AWS_0025'
+          #config_path: ./.github/linters/.terrascan.yaml
+          skip_rules: 'AC_AWS_0032, AC_AWS_0026, AC_AWS_0025'
