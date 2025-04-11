@@ -1,3 +1,4 @@
+---
 policy:
   skip:
     - AC_AWS_0486 # skip geo restriction; try to keep it worldwide for now
