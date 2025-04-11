@@ -1,17 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Website - Bitcoin Browser Miner
+This is the user-facing frontend to the project.
+
+It requires users to sign up / sign in before they will be able to start mining. The sign in is required, as there needs to be a secure way to send and transmit data to the backend, and also a way to limit the number of concurrent users active (if things get too expensive to run).
+
+The site is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app). It uses the following AWS services:
+
+- S3
+- CloudFront
+- Cognito (with some lambdas to support OTP logins)
+- Route53
+- API Gateway (and lambdas)
+
+These services and the site are deployed via GitHub actions with Terraform (see: ../backend/terraform/).
 
 ## Setting up local environment
 
 - Copy `.env.local.example` to `.env.local` and fill in the necessary credentials and secrets. You csan get these after deploying the terraform and logging into AWS Console for Cognito.
 
+```bash
+cp .env.local.example .env.local
+echo "fill out the values in .env.local"
+```
+
 ## Setting up remote environment
 
 - You will need to set corresponding env variables (from `.env.local`) in your cloud environment (e.g., GitHub secrets).
 
-
 ## Getting Started
 
-First, run the development server:
+First, install the development server:
+
+```bash
+npm install
+```
+
+Then run the server:
 
 ```bash
 npm run dev
@@ -24,6 +47,8 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+################################## delete below eventually
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

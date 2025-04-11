@@ -11,7 +11,7 @@ variable "domain_name" {
 variable "aws_route53_zone_name" {
   description = "custom domain name for site"
   type        = string
-  default     = "bitcoinbrowserminer.com"
+  default     = "bitcoinbrowserminer.com" # must own this domain
 }
 
 variable "aws_region" {

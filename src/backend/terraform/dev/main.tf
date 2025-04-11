@@ -13,7 +13,6 @@ module "website" {
   environment        = var.environment
   domain_name        = var.domain_name
   aws_region         = var.aws_region
-  project_name       = var.project_name
 
   providers = {
     aws.acm = aws.useast1
