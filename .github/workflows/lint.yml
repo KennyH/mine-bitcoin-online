@@ -47,4 +47,5 @@ jobs:
           policy_type: aws
           iac_dir: src/backend/terraform
           #config_path: ./.github/linters/.terrascan.yaml
-          skip_rules: 'AC_AWS_0032, AC_AWS_0026, AC_AWS_0025'
+          # None of this seems to work...  
+          skip_rules: 'AC_AWS_0032,AC_AWS_0026,AC_AWS_0025'
