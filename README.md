@@ -25,4 +25,6 @@ Service that allows users to mine Bitcoin though their browser
 - db lifecycle and backuper solution
 - GDPR solution (consent, data deletion, data retrieval)
 
+- check out [deploythefleet.io](https://deploythefleet.io/) for simple design inspiration 
+
 
