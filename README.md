@@ -10,7 +10,8 @@ Service that allows users to mine Bitcoin though their browser
 # To Do List
 - Cognito setup
 - Cognito login on site
-- Raspberry pi bitcoin Node setup
+- [done] Raspberry pi bitcoin Node setup
+- build creation script for automating new pi devices
 - aws iot on the pi (see how we can automate others)
 - api built to ping pi and get data (block to solve)
 - api built to validate solution on lambda
