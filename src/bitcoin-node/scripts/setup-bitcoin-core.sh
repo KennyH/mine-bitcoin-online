@@ -4,7 +4,7 @@
 # Syncing the mainnet blockchain can take a few days to complete.
 
 # Variables
-BITCOIN_VERSION="28.1"
+BITCOIN_VERSION="28.1" # you can see live versions here: https://bitcoin.clarkmoody.com/dashboard/
 RPC_USER=$(hostname)
 RPC_PASSWORD=$(openssl rand -hex 32)
 BITCOIN_DIR="$HOME/.bitcoin"
