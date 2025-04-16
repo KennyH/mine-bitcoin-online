@@ -2,11 +2,37 @@
 
 #sudo apt install -y bc jq
 
-# This script is just a wrapper around getblockchaininfo, that makes
-# it easier to read. You can call it once (after chmod +x'ing it),
-# and/or call it via `watch -n 5 ./btcstatus.sh` to track the progress.
+show_help() {
+    cat << EOF
+Usage: $0 [--testnet] [--help|-h]
 
-data=$(bitcoin-cli getblockchaininfo)
+This script is a wrapper around 'bitcoin-cli getblockchaininfo' that makes
+the output easier to read. By default, it queries your mainnet node.
+Use --testnet to query your testnet node.
+
+Examples:
+  $0           # Show mainnet status
+  $0 --testnet # Show testnet status
+  $0 --help    # Show this help message
+
+Tip: Use with 'watch' to monitor progress:
+  watch -n 5 $0
+EOF
+}
+
+# Default to mainnet
+BITCOIN_CLI="bitcoin-cli -conf=$HOME/.bitcoin/bitcoin.conf -datadir=$HOME/.bitcoin"
+
+# Parse flags
+if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+    show_help
+    exit 0
+elif [[ "$1" == "--testnet" ]]; then
+    BITCOIN_CLI="bitcoin-cli -conf=$HOME/.bitcoin-testnet/bitcoin.conf -datadir=$HOME/.bitcoin-testnet"
+    shift
+fi
+
+data=$($BITCOIN_CLI getblockchaininfo)
 
 time=$(jq '.time' <<< "$data")
 mediantime=$(jq '.mediantime' <<< "$data")
@@ -21,9 +47,6 @@ mediantime_pst=$(TZ=America/Los_Angeles date -d @"$mediantime" '+%Y-%m-%d %H:%M:
 size_on_disk_gb=$(echo "scale=3; $size_on_disk/1073741824" | bc)
 
 # Format difficulty
-# The concept of difficulty is x times the original difficulty set
-# by Satoshi, so it is useful to format it (e.g. now it is 20
-# trillion times more difficult) 
 integer_part=$(echo "$difficulty" | cut -d'.' -f1)
 decimal_part=$(echo "$difficulty" | cut -d'.' -f2)
 
