@@ -53,7 +53,7 @@ fi
 # Variables
 USER_HOME=$(eval echo ~${SUDO_USER:-$USER})
 BITCOIN_USER=${SUDO_USER:-$USER}
-BITCOIN_MAINNET_DIR="$USER_HOME/.bitcoin-mainnet"
+BITCOIN_MAINNET_DIR="$USER_HOME/.bitcoin"
 BITCOIN_TESTNET_DIR="$USER_HOME/.bitcoin-testnet"
 BITCOIN_BIN_DIR="/usr/local/bin"
 BITCOIN_TARBALL="bitcoin-${BITCOIN_VERSION}-aarch64-linux-gnu.tar.gz"
@@ -76,6 +76,7 @@ if [ ! -f "$USER_HOME/$BITCOIN_TARBALL" ] || $FORCE; then
     fi
     tar -xvf "$BITCOIN_TARBALL"
     sudo install -m 0755 -o root -g root -t $BITCOIN_BIN_DIR bitcoin-${BITCOIN_VERSION}/bin/*
+    rm -rf "$USER_HOME/bitcoin-${BITCOIN_VERSION}"
 fi
 
 # Function to create config
@@ -110,11 +111,16 @@ create_service() {
     local NAME=$1
     local DIR=$2
     local CONF_FILE="$DIR/bitcoin.conf"
-    local SERVICE_FILE="/etc/systemd/system/bitcoind-${NAME}.service"
+    local SERVICE_FILE
+    if [ "$NAME" = "testnet" ]; then
+        SERVICE_FILE="/etc/systemd/system/bitcoind-testnet.service"
+    else
+        SERVICE_FILE="/etc/systemd/system/bitcoind.service"
+    fi
     if [ ! -f "$SERVICE_FILE" ] || $FORCE; then
         sudo bash -c "cat << EOF > $SERVICE_FILE
 [Unit]
-Description=Bitcoin daemon (${NAME})
+Description=Bitcoin daemon${NAME:+ ($NAME)}
 After=network.target
 
 [Service]
@@ -132,14 +138,19 @@ WantedBy=multi-user.target
 EOF"
     fi
     sudo systemctl daemon-reload
-    sudo systemctl enable "bitcoind-${NAME}.service"
-    sudo systemctl restart "bitcoind-${NAME}.service"
+    if [ "$NAME" = "testnet" ]; then
+        sudo systemctl enable bitcoind-testnet.service
+        sudo systemctl restart bitcoind-testnet.service
+    else
+        sudo systemctl enable bitcoind.service
+        sudo systemctl restart bitcoind.service
+    fi
 }
 
 # Mainnet setup
 if $INSTALL_MAINNET; then
     create_config "$BITCOIN_MAINNET_DIR" false
-    create_service "mainnet" "$BITCOIN_MAINNET_DIR"
+    create_service "" "$BITCOIN_MAINNET_DIR"
     sleep 10
     $BITCOIN_BIN_DIR/bitcoin-cli -conf="$BITCOIN_MAINNET_DIR/bitcoin.conf" -datadir="$BITCOIN_MAINNET_DIR" getblockchaininfo || true
     echo "Mainnet node setup complete."
