@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Bitcoin Browser Miner",
   description: "Browser-based Bitcoin mining lottery.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
