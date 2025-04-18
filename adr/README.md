@@ -7,3 +7,4 @@ ADRs help us document *why* certain technical choices were made, providing conte
 ## Records
 
 *   [ADR-001: Candidate Block Publishing and Notification](./ADR-001-candidate-block-publishing-and-notification.md) - Describes how Bitcoin block templates are generated, signed, published, and how users are notified via AWS IoT Core.
+*   [ADR: 002 - Block Reward Distribution and User Payout](./ADR-002-block-reward-distribution-and-user-payout.md) - Defines the phased approach for securely managing and distributing Bitcoin mining rewards to users.
