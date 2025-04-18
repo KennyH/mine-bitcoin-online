@@ -6,7 +6,7 @@
 
 ---
 
-***Context:**
+**Context:**
 
 We need a way to send Bitcoin candidate block templates from a private Raspberry Pi node to logged-in users on our website. Users will mine these templates in their browser using WASM. We need near real-time notifications when a new template is ready. We also need a way to check if a user claiming to have found a solution actually worked on the template we provided, and inform the user of the outcome. The system should be low-cost and must not expose the home network hosting the Pi node.
 
