@@ -87,6 +87,16 @@ create_config() {
     local RPC_USER=$(hostname)
     local RPC_PASSWORD=$(openssl rand -hex 32)
     mkdir -p "$DIR"
+
+    # ZMQ ports differ by mainnet/testnet
+    if $IS_TESTNET; then
+        ZMQ_BLOCK_PORT=28333
+        ZMQ_TX_PORT=28332
+    else
+        ZMQ_BLOCK_PORT=28334
+        ZMQ_TX_PORT=28335
+    fi
+
     if [ ! -f "$CONF_FILE" ] || $FORCE; then
         cat << EOF > "$CONF_FILE"
 # Bitcoin Core basic configuration
@@ -99,6 +109,10 @@ rpcallowip=127.0.0.1
 prune=0
 dbcache=1024
 maxconnections=20
+
+# Enable ZMQ for block and transaction notifications
+zmqpubrawblock=tcp://127.0.0.1:${ZMQ_BLOCK_PORT}
+zmqpubrawtx=tcp://127.0.0.1:${ZMQ_TX_PORT}
 EOF
         if $IS_TESTNET; then
             echo "testnet=1" >> "$CONF_FILE"
