@@ -8,7 +8,7 @@
 
 **Context:**
 
-We need a way to send Bitcoin candidate block templates from a private Raspberry Pi node to logged-in users on our website. Users will mine these templates in their browser using WASM. We need near real-time notifications when a new template is ready. We also need a way to check if a user claiming to have found a solution actually worked on the template we provided, and inform the user of the outcome. The system should be low-cost and must not expose the home network hosting the Pi node.
+We need a way to send Bitcoin candidate block templates from a private Raspberry Pi node to logged-in users on our website. Users will mine these templates in their browser using WASM. We need near real-time notifications when a new template is ready. We also need a way to check if a user claiming to have found a solution actually worked on the template we provided, and inform the user of the outcome. The system should be low-cost, must not expose the home network hosting the Pi node, and must avoid storing long-term AWS credentials on the Pi.
 
 ---
 
@@ -25,8 +25,9 @@ We will use the following process:
     *   The script prepares a JSON object containing the template data, the calculated signature, and an identifier for the Pi's public key.
 
 2.  **Publishing (Raspberry Pi):**
-    *   The script uploads the signed JSON template to AWS S3 using a unique, versioned name (e.g., `template_[PREVHASH].json`).
-    *   The script connects **outbound** to AWS IoT Core MQTT using its device certificate.
+    *   **AWS Credentials:** The Pi script obtains temporary AWS credentials using the **AWS IoT Core Credentials Provider (via a Role Alias)** configured for its device certificate. This avoids storing long-term AWS keys on the device. The associated IAM role grants necessary permissions for S3 upload.
+    *   Using these temporary credentials, the script uploads the signed JSON template to AWS S3 using a unique, versioned name (e.g., `template_[PREVHASH].json`).
+    *   The script connects **outbound** to AWS IoT Core MQTT using its device certificate for MQTT communication.
     *   It publishes a small notification message to a specific IoT topic (e.g., `pi/bitcoin/template/notify`). This message contains the full **CloudFront URL** corresponding to the newly uploaded template JSON.
 
 3.  **User Login & Notification (AWS Cloud & Browser):**
@@ -48,17 +49,21 @@ We will use the following process:
         *   The **Lambda function** performs initial validation:
             *   Retrieves the User ID from the Cognito context.
             *   Retrieves the Pi's public key corresponding to the ID in the template.
-            *   Verifies the signature within the received JSON template data. If invalid, record rejection in DynamoDB (Step 6) and stop.
-            *   Reconstructs the block header using the verified template data and the submitted nonce.
-            *   Calculates the block hash.
+            *   Verifies the signature within the received JSON template data (confirming authenticity of header components). If invalid, record rejection in DynamoDB (Step 6) and stop.
+            *   Reconstructs the block header *components* using the verified template data and the submitted nonce.
+            *   Calculates the block hash based on these components.
             *   Checks if the hash meets the difficulty target (`bits`). If invalid, record rejection in DynamoDB (Step 6) and stop.
-        *   If initial validation passes, the Lambda records "Pending Node Validation" status in DynamoDB (Step 6) and **publishes an MQTT message** (containing Submission ID, solved block hex/data) to a specific "submission" topic on **AWS IoT Core**.
+        *   If initial validation passes, the Lambda records "Pending Node Validation" status in DynamoDB (Step 6) and **publishes an MQTT message** (containing Submission ID, winning `nonce`, and a `template_identifier` like `previousblockhash`) to a specific "submission" topic on **AWS IoT Core**.
 
-6.  **Final Verification & Result Persistence (Pi -> DynamoDB):**
-    *   A script on the **Raspberry Pi** (subscribed to the submission topic via its secure IoT connection) receives the MQTT message from Lambda.
-    *   The Pi script calls the local `bitcoind` **`submitblock` RPC command** with the received block data.
+6.  **Final Assembly, Verification & Result Persistence (Pi -> DynamoDB):**
+    *   A script on the **Raspberry Pi** (subscribed to the submission topic via its secure IoT connection) receives the MQTT message (Submission ID, `nonce`, `template_identifier`) from Lambda.
+    *   The Pi script **retrieves the full original block data** (including all transaction hex) associated with the `template_identifier` (e.g., from a temporary cache or by re-querying necessary data).
+    *   It **assembles the full block**: constructs the 80-byte header using the original components plus the winning `nonce`, then serializes the header and all original transactions into the final binary block format.
+    *   It **converts the binary block to hex**.
+    *   The Pi script calls the local `bitcoind` **`submitblock <final_block_hex>` RPC command**.
     *   The Pi script captures the result from `submitblock` (e.g., success/accepted with block hash, or rejection reason like "duplicate", "invalid", etc.).
-    *   The Pi script uses AWS credentials (e.g., via IoT role alias or credentials file) to **update a DynamoDB table** item (identified by Submission ID) with the final status: "Node Accepted: [blockhash]" or "Node Rejected: [reason]".
+    *   **AWS Credentials:** The Pi script again uses the **AWS IoT Core Credentials Provider** to obtain temporary credentials. The associated IAM role grants necessary permissions for DynamoDB update.
+    *   Using these temporary credentials, the Pi script **updates the DynamoDB table** item (identified by Submission ID) with the final status: "Node Accepted: [blockhash]" or "Node Rejected: [reason]".
     *   *Table Schema Example:* `SubmissionID (PK)`, `UserID`, `Timestamp`, `TemplatePrevHash`, `Nonce`, `LambdaStatus`, `NodeStatus`, `NodeRejectReason`, `AcceptedBlockHash`.
     *   The website frontend can query this DynamoDB table (via a separate secure API endpoint) to display the submission status back to the user.
 
@@ -70,6 +75,7 @@ We will use the following process:
     *   Home network remains secure (only outbound connections from Pi).
     *   Low-latency notifications via IoT Core push.
     *   Low cost (uses generous free tiers for Cognito, IoT Core, S3, CloudFront, Lambda, DynamoDB).
+    *   **No long-term AWS credentials stored on the Pi**, uses secure IoT Role Alias mechanism.
     *   Template signing allows backend verification, preventing fake submissions.
     *   Submission results are persisted for user feedback.
     *   Uses standard, scalable AWS services for cloud components.
@@ -77,8 +83,8 @@ We will use the following process:
     *   Initial validation load handled by Lambda.
 *   **Cons:**
     *   System relies on the Pi node's uptime and home internet connection.
-    *   Increased setup complexity (Pi scripts, signing, Cognito, IoT, Lambda, DynamoDB table/permissions, result query API).
-    *   Securely managing the signing private key and AWS credentials on the Pi is critical.
+    *   Increased setup complexity (Pi scripts, signing, Cognito, IoT policies/Role Alias, Lambda, DynamoDB table/permissions, result query API).
+    *   Securely managing the **signing private key** and the **IoT device certificate/key** on the Pi is critical.
     *   Coinbase pays to a pool address, requiring manual/separate payout process if a block is found.
     *   Browser mining has a near-zero chance of finding a real block (must be clearly stated to users).
 
