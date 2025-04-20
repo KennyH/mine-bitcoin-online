@@ -22,7 +22,7 @@ We will use the following process:
     *   **Data Extraction and Local Storage:** It extracts *all* necessary block template details: the full coinbase structure, transaction hex data for all non-coinbase transactions, Merkle sibling hashes needed for the coinbase path, and the actual extra nonce insertion point within the `scriptSig`. It defines a **potential Work Block range** of extra nonces from the `getblocktemplate` output that the cloud system will use as the basis for work units.
     *   It **stores the full transaction hex data, the full coinbase template details, Merkle sibling hashes, and the extra nonce insertion point** from the `getblocktemplate` output into a local encrypted SQLite database using SQLCipher, using a generated `template_identifier` as the primary key. It also records a `generation_timestamp`. This storage happens *before* triggering the Lambda, ensuring the data is locally available when needed for submission processing.
     *   **Local Cleanup:** After storing new data, it removes entries older than 120 minutes (based on `generation_timestamp`) from the SQLite database.
-    *   **Payload Preparation:** It prepares a smaller payload for the cloud, containing the essential, non-bulky data: the `template_identifier`, standard header fields (version, previousblockhash, curtime, bits), the *potential* Work Block range (start and end extra nonce values), the **relevant coinbase template structure information** required to insert an extra nonce and re-calculate the coinbase hash (as defined in the 'Clearly Specified Formats' section), and the calculated ** Merkle sibling hashes**.
+    *   **Payload Preparation:** It prepares a smaller payload for the cloud, containing the essential, non-bulky data: the `template_identifier`, standard header fields (version, previousblockhash, curtime, bits), the *potential* Work Block range (start and end extra nonce values), the **relevant coinbase template structure information** required to insert an extra nonce and re-calculate the coinbase hash (as defined in the 'Specified Formats' section below), and the calculated **Merkle sibling hashes**.
     *   Obtains temporary AWS credentials using the **AWS IoT Core Credentials Provider (via a Role Alias)**. The associated IAM role grants permission to trigger a specific Lambda function (e.g., via publishing to an SNS topic or calling API Gateway).
     *   Sends the prepared payload (excluding the bulky transaction hex data) to the trigger service (e.g., API Gateway), initiating the cloud process. The Pi's direct involvement ends here until submission processing.
     *   **Security Hygiene:** IoT certificates and Role Aliases will be clearly documented and managed through automated provisioning and renewal processes.
@@ -91,7 +91,7 @@ We will use the following process:
 
 ---
 
-**Clearly Specified Formats:**
+**Specified Formats:**
 
 *   Hashes (previousblockhash, Merkle sibling hashes): Hexadecimal, big-endian format.
 *   Nonces (extra_nonce, main_nonce): Numeric, unsigned 32-bit integers.
