@@ -133,21 +133,21 @@ We will use the following process:
     *   Home network remains secure (only outbound from Pi).
     *   Low-latency notifications via IoT Core for *new main templates*.
     *   Mechanism for late-connecting users.
-    *   **Highly scalable work distribution via SQS Work Queue consumption** by miners, offloading Pi.
-    *   **Pi focused on `bitcoind`, local data, and submission processing.**
+    *   Scalable work distribution via SQS Work Queue consumption by miners, offloading Pi.
+    *   The Pi node focused on `bitcoind`, local data, and submission processing
     *   Lower AWS costs (smaller S3/CloudFront objects, less frequent pub).
     *   Low IoT Core costs.
-    *   **KMS signing key secured.**
-    *   **No long-term AWS credentials on Pi**, uses IoT Role Alias.
+    *   KMS signing key secured.
+    *   No long-term AWS credentials on Pi, uses IoT Role Alias.
     *   Signed core template data enables backend verification without full S3 object lookup on submission.
     *   Submission results persisted in DynamoDB.
     *   Uses standard, scalable AWS services.
     *   Secure communication paths (TLS enforced).
     *   Initial validation load on Lambda.
-    *   **Leverages distributed client compute.**
-    *   **SQS Submission Queue decouples Pi processing**, provides durability. DLQs added.
-    *   **Initial SQS Work Queue costs low** (20 messages/block).
-    *   **Local encrypted SQLite on Pi** provides performant storage for assembly data for recent templates.
+    *   Leverages distributed client compute.
+    *   SQS Submission Queue decouples Pi processing, provides durability. DLQs added.
+    *   Initial SQS Work Queue costs low (20 messages/block).
+    *   Local encrypted SQLite on Pi provides performant storage for assembly data for recent templates.
 
 *   **Cons:**
     *   Relies on Pi uptime and home connection. Pi submission processing is a potential bottleneck.
@@ -155,8 +155,8 @@ We will use the following process:
     *   Secure management of Pi's **IoT device certificate/key is critical**.
     *   Coinbase pays to a single pool address.
     *   Browser mining has near-zero chance of finding a real block.
-    *   **Increased complexity for WASM miner** (fetch template, SQS interaction, mining logic, template transitions).
-    *   **Increased complexity in Lambdas/Pi for verification/assembly** (using submitted extra nonce, deriving/retrieving details).
+    *   Increased complexity for WASM miner (fetch template, SQS interaction, mining logic, template transitions).
+    *   Increased complexity in Lambdas/Pi for verification/assembly (using submitted extra nonce, deriving/retrieving details).
     *   Pi needs to manage storage and cleanup (120 min window). Submissions for older templates rejected ("Node Data Not Found").
     *   Slight latency for miner requesting new work unit (SQS `ReceiveMessage`).
     *   Requires careful SQS message visibility timeout management.
