@@ -8,7 +8,7 @@
 
 **Context:**
 
-We need a way to send Bitcoin candidate block templates from a private Raspberry Pi node to logged-in users on our website. Users will mine these templates in their browser using WebAssembly (WASM). We need near real-time notifications when a new template is ready. We also need a way to check if a user claiming to have found a solution actually worked on the template we provided, and inform the user of the outcome. The system should be low-cost, must not expose the home network hosting the Pi node, and must avoid storing long-term AWS credentials or signing private keys on the Pi. **To minimize AWS infrastructure costs associated with template distribution and leverage distributed client compute, the strategy involves publishing less frequent, optimized templates containing necessary data for client-side Merkle root calculation for varying extra nonces.**
+We need a way to send Bitcoin candidate block templates from a private Raspberry Pi node to logged-in users on our website. Users will mine these templates in their browser using WebAssembly (WASM). We need near real-time notifications when a new template is ready. We also need a way to check if a user claiming to have found a solution actually worked on the template we provided, and inform the user of the outcome. The system should be low-cost, must not expose the home network hosting the Pi node, and must avoid storing long-term AWS credentials or signing private keys on the Pi. **To minimize AWS infrastructure costs and offload potential Pi bottlenecks for work assignment, template details will be published less frequently, and work unit distribution within those templates will be managed via an SQS queue consumed directly by miners.**
 
 ---
 
@@ -16,77 +16,72 @@ We need a way to send Bitcoin candidate block templates from a private Raspberry
 
 We will use the following process:
 
-1.  **Block Template Generation & Data Preparation (Raspberry Pi & AWS KMS):**
+1.  **New Block Detection & Lambda Trigger (Raspberry Pi):**
     *   The Pi node runs `bitcoind` (Mainnet/Testnet) with ZMQ enabled for instant new block detection.
     *   A script on the Pi listens to ZMQ. When a new block is detected, it calls `getblocktemplate` via RPC for the next block height.
     *   The script extracts necessary standard block header data (version, previousblockhash, curtime, bits).
     *   Crucially, the script extracts the **coinbase transaction template details**, including indication of where the extra nonce should be inserted within the `scriptSig`, and the **hashes of all non-coinbase transactions** from the `getblocktemplate` output.
-    *   The script then calculates the **Merkle tree** based on the extracted transaction hashes (treating the position for the coinbase hash as variable for now) and identifies the specific ordered list of **sibling hashes** required to reconstruct the Merkle root path starting from the coinbase transaction's position upwards. This list of sibling hashes constitutes the Merkle path data needed by the client.
+    *   The script calculates the **Merkle tree** based on the extracted transaction hashes and identifies the specific ordered list of **sibling hashes** required to reconstruct the Merkle root path from the coinbase transaction's position upwards.
+    *   It defines a **large Work Block range** of extra nonces that will be the basis for the work units distributed from the SQS queue.
     *   **Coinbase Address:** The coinbase transaction template will pay out to a single address controlled by the Pi node's wallet (the "pool address").
-    *   The script identifies a **starting extra nonce value** for client miners to begin their search range.
-    *   **Signing via KMS:**
-        *   The script creates a standard string representation from the extracted template data, including the standard header fields, the coinbase transaction template details, the **calculated list of Merkle sibling hashes**, and the designated start extra nonce. **Note: This string does NOT include a pre-calculated *full* Merkle Root, as the WASM client will calculate this for varying extra nonces.**
-        *   The script obtains temporary AWS credentials using the **AWS IoT Core Credentials Provider (via a Role Alias)**. The associated IAM role grants `kms:Sign` permission on a specific KMS key.
-        *   Using the AWS SDK and these credentials, the script calls the **`kms:Sign` API**, sending the standardized string (or its hash) and the KMS Key ID.
-        *   **AWS KMS** performs the signature using the private key stored securely within KMS and returns the signature blob to the Pi script. The signing private key never leaves KMS.
-    *   The script prepares a JSON object containing the standard template data (version, prev\_hash, curtime, bits), the coinbase transaction template details, the **list of Merkle sibling hashes**, the start extra nonce, the **KMS-generated signature**, and an identifier for the KMS key used (e.g., a combination of previous block hash and start extra nonce).
+    *   The script prepares a payload containing the template identifier (e.g., previous block hash + Work Block start extra nonce), standard header fields, coinbase template details, Merkle sibling hashes, and the Work Block range.
+    *   The script obtains temporary AWS credentials using the **AWS IoT Core Credentials Provider (via a Role Alias)**. The associated IAM role grants permission to trigger a specific Lambda function (e.g., via publishing to an SNS topic or calling API Gateway).
+    *   The script sends this payload to the trigger service, initiating the cloud-based template and queue management process. The Pi's direct involvement with AWS for this block template ends here until submission processing.
 
-2.  **Publishing (Raspberry Pi):**
-    *   **AWS Credentials:** The Pi script uses the same temporary AWS credentials obtained via the IoT Role Alias (Step 1). The associated IAM role also grants necessary permissions for S3 upload.
-    *   Using these temporary credentials, the script uploads the signed JSON object to AWS S3 using a unique, versioned name that includes the identifier (e.g., `template_[ID].json`).
-    *   The script connects **outbound** to AWS IoT Core MQTT using its device certificate for MQTT communication.
-    *   It publishes a small notification message to a specific IoT topic (e.g., `pi/bitcoin/template/notify`). This message contains the full **CloudFront URL** corresponding to the newly uploaded template JSON.
-    *   The Pi script will generate and publish new versions of this template periodically (e.g., every few minutes) by obtaining a new start extra nonce range, potentially updating the timestamp, and repeating steps 1 and 2.
+2.  **Template Processing, SQS Work Queue Population & Main Template Publication (AWS Lambda triggered by Pi):**
+    *   A **dedicated AWS Lambda function** is triggered by the Pi's notification payload.
+    *   The Lambda receives the template data (identifier, header fields, coinbase template, Merkle sibling hashes, Work Block range).
+    *   The Lambda performs the following:
+        *   **Sign Core Template Data (via KMS):** It creates a standard string representation of the core template data (identifier, header fields, coinbase template details, Merkle sibling hashes, Work Block range) and calls the **`kms:Sign` API** using its execution role to sign this data. The signature and KMS Key ID are returned to the Lambda.
+        *   **Generate Sub-Ranges:** It divides the Work Block range into many smaller, sequential `extra_nonce` sub-ranges (e.g., ranges of 10,000 nonces each).
+        *   **Populate SQS Work Queue:** For each sub-range, it constructs a message containing the template identifier and the sub-range boundaries (`start_extra_nonce`, `end_extra_nonce`). It uses the AWS SDK to **batch send these messages to the dedicated SQS Work Queue** associated with the current Work Block. It should ensure the queue is empty of previous block's messages or use block identifiers for separation.
+        *   **Publish Main Template:** It constructs the main Work Block template JSON object containing the signed core template data (identifier, header fields, coinbase template, Merkle sibling hashes, Work Block range, KMS signature, Key ID). It uses the AWS SDK to upload this JSON to AWS S3 using a unique, versioned name based on the template identifier.
+        *   **Publish CloudFront Notification:** It sends a small MQTT notification (via IoT Core) to the client topic containing the CloudFront URL for the newly uploaded main Work Block template JSON.
 
 3.  **User Login & Notification (AWS Cloud & Browser):**
-    *   Users log into the website using AWS Cognito User Pools (configured for desired login method).
-    *   After login, the browser uses Cognito Identity Pools to get temporary AWS credentials. These credentials grant permission to connect to AWS IoT Core.
-    *   The browser connects **outbound** to AWS IoT Core MQTT over WebSockets Secure (WSS) using the temporary credentials.
-    *   The browser subscribes to the notification topic (`pi/bitcoin/template/notify`).
-    *   When AWS IoT Core pushes the notification message, the browser receives the CloudFront URL for the latest template JSON.
+    *   Users log into the website and use Cognito Identity Pools to get temporary AWS credentials, granting permissions for IoT Core and **SQS Work Queue access**.
+    *   The browser connects to AWS IoT Core MQTT and subscribes to the notification topic.
+    *   When AWS IoT Core pushes the notification message containing the CloudFront URL for a new main Work Block template, the browser receives it.
 
-4.  **Mining (Browser):**
-    *   The browser fetches the signed template JSON from the CloudFront URL.
-    *   The browser passes the template data (standard fields, coinbase template details, **list of Merkle sibling hashes**, start extra nonce, KMS signature, Key ID) to the WASM miner.
-    *   The WASM miner processes this data:
-        *   It stores the standard fields and the list of Merkle sibling hashes.
-        *   It takes the `start_extra_nonce` provided.
-        *   It enters a loop to iterate the `extra_nonce` (starting from the provided value and incrementing).
-        *   For each `extra_nonce` value:
-            *   It constructs the coinbase transaction bytes by inserting/modifying the `scriptSig` using the coinbase transaction template and the current `extra_nonce`.
-            *   It calculates the hash of this specific coinbase transaction (\(TxID_0'\)).
-            *   It calculates the **Merkle Root** by taking \(TxID_0'\) and iteratively hashing it with the provided **list of Merkle sibling hashes** in the correct order up the tree path.
-            *   It constructs the full 80-byte block header using the standard fields (version, prev\_hash, curtime, bits), the *newly calculated Merkle root*, and the *main nonce* (starting from 0).
-            *   It enters a nested loop to iterate the `main_nonce` from 0 to \(2^{32}-1\). For each `main_nonce`, it hashes the constructed header using SHA256 and checks if it meets the difficulty target (`bits`).
-            *   If the `main_nonce` loop completes, it increments the `extra_nonce` and repeats the process.
-            *   If a valid hash is found within the `main_nonce` loop, the miner records the winning `main_nonce` and the current `extra_nonce` being used.
+4.  **Mining & Work Unit Consumption (Browser / WASM & SQS):**
+    *   The browser fetches the main Work Block template JSON from the CloudFront URL.
+    *   The browser/WASM miner uses its temporary AWS credentials to interact with the **SQS Work Queue**.
+    *   When the miner needs a work assignment:
+        *   It calls SQS `ReceiveMessage` on the dedicated Work Queue (identified, potentially, by information in the main template).
+        *   When a message is received, the miner extracts the template identifier and its assigned `[start_extra_nonce, end_extra_nonce]` sub-range from the message.
+        *   It sets the message's visibility timeout to prevent other miners from receiving the same range.
+        *   The miner then works on the assigned `extra_nonce` sub-range (iterating extra nonces within this range) using the data from the main Work Block template (standard fields, coinbase template, Merkle sibling hashes). For each extra nonce in its range, it calculates the Merkle root and iterates the main nonce (0 to \(2^{32}-1\)).
+    *   When the miner successfully completes its assigned sub-range, it sends an SQS `DeleteMessage` request for the corresponding message.
+    *   If a miner crashes or closes, the message's visibility timeout will expire, making the range available for another miner.
+    *   If a new main Work Block template notification arrives, the miner discards its current Work Queue message (or lets timeout expire) and starts requesting from the queue associated with the new Work Block.
 
-5.  **Solution Submission & Initial Verification (Browser -> AWS Lambda & KMS):**
-    *   If the WASM miner finds a nonce solution:
+5.  **Solution Submission & Initial Verification (Browser -> AWS Lambda -> Submission SQS Queue):**
+    *   If the WASM miner finds a nonce solution within its assigned SQS range:
         *   The browser generates a unique Submission ID.
-        *   The browser sends the Submission ID, the **original signed template JSON** it received (containing the full template data including the **list of Merkle sibling hashes**, KMS signature, and Key ID), the **found `main_nonce`**, and the **`extra_nonce` that resulted in the solution** to a secure backend endpoint (API Gateway + Lambda).
-        *   The **Lambda function** performs initial validation:
-            *   Retrieves the User ID from the Cognito context.
-            *   Extracts the KMS Key ID and signature from the submitted template JSON.
-            *   Reconstructs the original standardized string *from the template data within the submitted JSON* (standard fields, coinbase template, **list of Merkle sibling hashes**, start extra nonce).
-            *   Calls the **`kms:Verify` API** using its execution role (needs `kms:Verify` permission), sending the KMS Key ID, original string (or hash), and the signature. **If verification fails (signature invalid), record rejection in DynamoDB (Step 6) and stop. This validates the template data given to the client was authentic.**
-            *   Using the now-verified template data (specifically, the coinbase template details and the **list of Merkle sibling hashes**) and the *submitted winning `extra_nonce`*, the Lambda function **calculates the hash of the coinbase transaction and then calculates the Merkle Root** by iteratively hashing with the provided sibling hashes.
-            *   Reconstructs the block header *components* using the verified standard fields from the template, the *newly calculated Merkle Root (derived from the submitted extra nonce and sibling hashes)*, and the *submitted winning `main_nonce`*.
-            *   Calculates the block hash based on these components.
-            *   Checks if the hash meets the difficulty target (`bits`). If invalid, record rejection in DynamoDB (Step 6) and stop.
-        *   If all validation passes, the Lambda records "Pending Node Validation" status in DynamoDB (Step 6) and **publishes an MQTT message** (containing Submission ID, winning `main_nonce`, winning `extra_nonce`, and the template identifier) to a specific "submission" topic on **AWS IoT Core**.
+        *   The browser sends the Submission ID, the **original main Work Block template JSON** it received (containing the signed core data), the **found `main_nonce`**, and the **`extra_nonce` that resulted in the solution** to a secure backend endpoint (API Gateway + **Solution Verification Lambda**).
+        *   The Solution Verification Lambda performs initial validation:
+            *   Retrieves User ID from Cognito context.
+            *   Extracts KMS Key ID and signature from the main template JSON.
+            *   Reconstructs the original standardized core template string.
+            *   Calls **`kms:Verify`** to validate the Pi/Template Management Lambda's signature. If verification fails, record rejection and stop.
+            *   Using the verified core template data (coinbase template, Merkle sibling hashes) and the *submitted winning `extra_nonce`*, calculates the hash of the coinbase transaction and the Merkle Root.
+            *   Reconstructs the block header components using verified standard fields, the calculated Merkle Root, and the submitted `main_nonce`.
+            *   Calculates the final block hash and checks against the difficulty target. If invalid, record rejection and stop.
+            *   **(Optional/Future) Range Verification:** Could potentially verify that the submitted `extra_nonce` falls within the Work Block range specified in the signed main template. For added robustness (though more complex), it could verify it was within a range *assigned* from the SQS queue (requires tracking assignments). For now, basic validity against the main template is sufficient.
+        *   If all validation passes, the Lambda constructs a submission message (Submission ID, user ID, winning nonces, template identifier, etc.) and places it onto a **Submission SQS Queue**. It updates DynamoDB with a "Pending Node Processing" status.
 
-6.  **Final Assembly, Verification & Result Persistence (Pi -> DynamoDB):**
-    *   A script on the **Raspberry Pi** (subscribed to the submission topic via its secure IoT connection) receives the MQTT message (Submission ID, `main_nonce`, `extra_nonce`, template identifier) from Lambda.
-    *   The Pi script needs access to the **full original block data** (including all transaction hex) that was used to generate the specific template version the user worked on. It should retrieve this based on the template identifier (e.g., from a temporary cache or persistent storage). It also needs access to the specific **list of Merkle sibling hashes** that was included in the template corresponding to the submission.
-    *   It **assembles the full block**: uses the original transaction hex, reconstructs the coinbase transaction *using the submitted winning `extra_nonce`*, calculates the coinbase txid. It then calculates the correct Merkle root by iteratively hashing the coinbase txid with the appropriate list of Merkle sibling hashes for that template version (which should match the root the Lambda calculated). Constructs the 80-byte header using the original verified components (version, prev\_hash, curtime, bits) plus the calculated Merkle root and the winning `main_nonce`. It serializes the header and all original transactions into the final binary block format.
-    *   It **converts the binary block to hex**.
+6.  **Final Assembly & Submission Processing (Raspberry Pi Polling Submission SQS Queue):**
+    *   A script on the **Raspberry Pi** uses its secure IoT connection to obtain temporary AWS credentials, granting permission to **`sqs:ReceiveMessage`, `sqs:DeleteMessage`** on the Submission SQS Queue and DynamoDB update permissions.
+    *   The Pi script **polls the Submission SQS Queue** periodically for new messages.
+    *   When a submission message is received, the Pi extracts the submission details.
+    *   The Pi needs access to the **full original block transaction data** corresponding to the template identifier (from local cache or storage). It also needs the Merkle sibling hashes (could be included in the submission message or retrieved based on the identifier).
+    *   It **assembles the full block**: uses the original transaction hex, reconstructs the coinbase transaction *using the submitted winning `extra_nonce`*, calculates the coinbase txid and Merkle root (using sibling hashes). Constructs the 80-byte header using original verified components, calculated Merkle root, and the winning `main_nonce`. Serializes to binary block format.
+    *   It converts the binary block to hex.
     *   The Pi script calls the local `bitcoind` **`submitblock <final_block_hex>` RPC command**.
     *   The Pi script captures the result from `submitblock`.
-    *   **AWS Credentials:** The Pi script again uses the **AWS IoT Core Credentials Provider** to obtain temporary credentials. The associated IAM role grants necessary permissions for DynamoDB update.
-    *   Using these temporary credentials, the Pi script **updates the DynamoDB table** item (identified by Submission ID) with the final status.
+    *   Using temporary credentials, it updates the DynamoDB table item for the Submission ID with the final status from `submitblock`.
+    *   The Pi script sends an SQS `DeleteMessage` for the processed submission message.
     *   *Table Schema Example:* `SubmissionID (PK)`, `UserID`, `Timestamp`, `TemplateIdentifier`, `WinningNonce`, `WinningExtraNonce`, `LambdaStatus`, `NodeStatus`, `NodeRejectReason`, `AcceptedBlockHash`.
-    *   The website frontend can query this DynamoDB table to display the submission status.
 
 ---
 
@@ -94,25 +89,30 @@ We will use the following process:
 
 *   **Pros:**
     *   Home network remains secure (only outbound connections from Pi).
-    *   Low-latency notifications via IoT Core push.
-    *   **Significantly lower AWS costs for S3 and CloudFront** due to much smaller template JSON size.
-    *   Lower costs for IoT Core and KMS due to less frequent template publishing.
-    *   **Signing private key secured within AWS KMS**, never stored on the Pi.
+    *   Low-latency notifications via IoT Core push for *new main templates*.
+    *   **Highly scalable work distribution via SQS Work Queue consumption** by miners, minimizing load on the Pi for individual work assignments.
+    *   **Pi's core task is focused on `bitcoind` interaction and submission processing**, offloading template/queue management to Lambda.
+    *   **Significantly lower AWS costs for S3 and CloudFront** due to much smaller template JSON size and less frequent main template publication.
+    *   Low costs for IoT Core.
+    *   **KMS signing key secured within AWS KMS**.
     *   **No long-term AWS credentials stored on the Pi**, uses secure IoT Role Alias mechanism.
-    *   Template data signing allows backend verification that the user worked on an authentic template.
-    *   Submission results are persisted for user feedback.
-    *   Uses standard, scalable AWS services for cloud components.
-    *   Secure communication path for submissions.
-    *   Initial validation load handled by Lambda.
-    *   **Leverages distributed client compute power** for a significant portion of the mining work (calculating coinbase hash, calculating Merkle root path, and hashing headers).
+    *   Signed core template data allows backend verification of the template's authenticity.
+    *   Submission results persisted.
+    *   Uses standard, scalable AWS services.
+    *   Secure communication paths.
+    *   Initial validation load on Lambda.
+    *   **Leverages distributed client compute for full mining work.**
+    *   **SQS Submission Queue decouples submission processing from the Lambda verification**, allowing the Pi to process them at its own pace and providing durability.
 *   **Cons:**
-    *   System relies on the Pi node's uptime and home internet connection.
-    *   Increased setup complexity (Pi scripts, KMS key setup, Cognito, IoT policies/Role Alias, Lambda function/role, DynamoDB table/permissions, result query API).
+    *   System relies on the Pi node's uptime and home internet connection for `bitcoind` and final submission.
+    *   Increased setup complexity (Pi scripts, multiple Lambda functions/roles, SQS queues/permissions, API Gateway, Cognito, IoT policies/Role Alias, S3/CloudFront, KMS).
     *   Securely managing the **IoT device certificate/key** on the Pi is critical.
-    *   Coinbase pays to a pool address, requiring manual/separate payout process if a block is found.
-    *   Browser mining has a near-zero chance of finding a real block (must be clearly stated to users).
-    *   **Increased complexity for the WASM miner** (must implement coinbase construction and Merkle path calculation logic).
-    *   **Increased complexity in Lambda and Pi verification** (must correctly use the submitted extra nonce and stored/provided Merkle sibling hashes to recalculate the Merkle root).
-    *   The Pi needs to store or be able to retrieve the full transaction data for a submitted template version to assemble the final block for `submitblock`.
+    *   Coinbase pays to a pool address, requiring manual/separate payout.
+    *   Browser mining has a near-zero chance of finding a real block.
+    *   **Increased complexity for the WASM miner** (must fetch main template, interact directly with SQS for work units, implement mining logic).
+    *   **Increased complexity in Lambdas and Pi verification** (must use submitted extra nonce and Merkle sibling hashes).
+    *   The Pi needs to store or retrieve the full transaction data and potentially the Merkle sibling hashes for a submitted template version.
+    *   Adds slight latency for a miner requesting a new work unit (SQS `ReceiveMessage` call).
+    *   Requires careful management of SQS message visibility timeouts to prevent work from being lost if a miner fails mid-range.
 
 ---
