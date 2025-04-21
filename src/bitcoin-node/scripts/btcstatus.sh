@@ -31,6 +31,9 @@ Examples:
 
 Tip: Use with 'watch' to monitor progress:
   watch -n 5 $0
+  or
+  watch -n 5 "echo '--- Mainnet Status ---'; ./btcstatus.sh; echo; echo '--- Testnet Status ---'; ./btcstatus.sh --testnet; echo; echo '--- Regtest Status ---'; ./btcstatus.sh --regtest"
+  
 EOF
 }
 
