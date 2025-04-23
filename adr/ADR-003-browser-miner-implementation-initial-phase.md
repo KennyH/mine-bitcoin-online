@@ -8,15 +8,13 @@
 
 **Context:**
 
-As defined in [ADR-001](./ADR-001-candidate-block-publishing-and-notification.md), the project requires a client-side Bitcoin miner operating within a web browser. This miner must fetch block candidate templates and work assignments, perform SHA256d hashing, and submit solutions. The miner must be responsive to user input (throttle control) and provide real-time feedback (hash rate), and not block the browser's main UI thread for computation.
-
-This ADR specifies the architecture for the initial implementation phase of the browser miner, focusing on delivering a functional and responsive core. Future phases (documented separately) will address performance improvements like multi-threaded WASM and GPU acceleration.
+As defined in [ADR-001](./ADR-001-candidate-block-publishing-and-notification.md), the project requires a responsive client-side Bitcoin miner running in a web browser. It must fetch block templates and work assignments, perform SHA256d hashing, submit solutions, support user throttle control, and provide real-time hash rate feedback without blocking the main UI thread. This ADR focuses on the initial implementation using a single-threaded WASM module within a Web Worker, deferring multi-threaded WASM and GPU acceleration to future phases.
 
 ---
 
 **Decision:**
 
-The initial browser miner will be implemented using Rust compiled to WebAssembly (WASM), running within one or more Web Workers to ensure the browser's main UI thread remains responsive. The core mining logic within each WASM instance will be single-threaded. The JavaScript host environment on the main thread will manage the user interface, communication with AWS services via the AWS SDK for JavaScript, and coordination with the Web Worker(s).
+The initial browser miner will use Rust compiled to single-threaded WebAssembly (WASM), executed within one or more Web Workers to keep the main UI thread responsive. A JavaScript host on the main thread will manage the user interface and coordination, while the worker handles WASM execution, work unit management (potentially including SQS interaction), and communication of mining progress and results back to the main thread.
 
 ---
 
@@ -78,9 +76,9 @@ The initial browser miner will be implemented using Rust compiled to WebAssembly
 
 **Dependencies:**
 
-*   Rust compiler with `wasm32-unknown-unknown` target.
-*   `wasm-bindgen` and `wasm-pack`.
-*   Rust crates for SHA256, Bitcoin data structures, Merkle tree calculation, JSON parsing (`serde`, `serde-wasm-bindgen`).
+*   Rust compiler (`wasm32-unknown-unknown` target).
+*   `wasm-bindgen`, `wasm-pack`.
+*   Rust crates: `sha2` ([https://github.com/RustCrypto/hashes/tree/master/sha2](https://github.com/RustCrypto/hashes/tree/master/sha2)), `rust-bitcoin` (core structures/hashing) ([https://github.com/rust-bitcoin/rust-bitcoin](https://github.com/rust-bitcoin/rust-bitcoin)), and JSON parsing (e.g., `serde`, `serde-wasm-bindgen`).
 *   AWS SDK for JavaScript V3.
 *   Browser supporting WebAssembly and Web Workers.
 
@@ -91,7 +89,7 @@ The initial browser miner will be implemented using Rust compiled to WebAssembly
 *   ADR-XXX: Multi-threaded WASM Mining: Implement parallelism within the WASM module using WASM Threads and `SharedArrayBuffer` to leverage multiple CPU cores. Requires compiling Rust with threading support and careful handling of shared memory and synchronization primitives. Requires specific HTTP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`).
 *   ADR-YYY: GPU Accelerated Mining: Implement the double SHA256 algorithm as a shader program (WebGPU using WGSL or WebGL using GLSL) to offload computation to the graphics card. Requires significant new code, different skill sets (shader programming), and browser/hardware support considerations.
 *   Adaptive Work Unit Requesting: Allow the miner worker to dynamically request larger or smaller SQS work unit ranges based on its current hash rate and target difficulty.
-*   Enhanced Error Handling & Reporting: More robust handling of network errors, SQS issues, WASM execution failures, and reporting these to the user and potentially backend monitoring.
+*   Enhanced Error Handling & Reporting: Handling of network errors, SQS issues, WASM execution failures, and reporting these to the user and potentially backend monitoring.
 *   Improved Worker Management: If using multiple workers, implement load balancing and coordination among them.
 
 ---
