@@ -33,6 +33,7 @@ The initial browser miner will use Rust compiled to single-threaded WebAssembly 
     *   Receives hash rate updates and solution findings from the worker via `worker.onmessage`.
     *   Updates the UI based on worker messages.
     *   If a solution is received, formats and submits the solution payload to the API Gateway endpoint.
+    *   Utilizes the Screen Wake Lock API (`navigator.wakeLock`) to prevent the device screen from dimming or turning off while the miner is actively running and the page is visible.
     *   Manages the throttle setting from the UI, translating it into instructions sent to the worker.
 3.  Web Worker (JavaScript):
     *   Runs in a separate background thread.
@@ -104,7 +105,7 @@ The initial browser miner will use Rust compiled to single-threaded WebAssembly 
     *   Throttle control is achievable by adjusting the worker's processing rate.
     *   Hash rate observability is possible by tracking hashes in the worker.
     *   Direct consumption of work units from SQS by the worker (or main thread) is scalable.
-    *   Fits within the AWS architecture defined in ADR-001.
+    *   Fits within the AWS architecture defined in [ADR-001](./ADR-001-candidate-block-publishing-and-notification.md).
     *   Foundation laid for future multi-threading and GPU enhancements.
 
 *   Cons:
