@@ -1,88 +1,112 @@
 'use client';
 import { useAuth } from './context/AmplifyAuthContext';
+import FooterLinks from './components/FooterLinks';
 
 export default function Home() {
   const { user, email, loading, login, logout } = useAuth();
 
   if (loading) {
-    return <div className="text-center py-20">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-[#00eaff] text-2xl font-semibold">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="bg-[#121212] text-white font-inter min-h-screen pb-20">
-      <header className="bg-gradient-to-r from-orange-500 to-pink-600 text-center py-16 px-4">
-        <h1 className="text-5xl font-bold">Bitcoin Browser Miner</h1>
-        <p className="text-xl opacity-90 mt-2">
+    <div className="min-h-screen flex flex-col bg-[#0a0c10] text-[#e0e6ed] font-sans">
+      {/* HEADER */}
+      <header className="w-full py-16 px-4 bg-gradient-to-br from-[#00eaff] via-[#1a1a2e] to-[#ff00cc] text-center shadow-lg">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white">
+          Bitcoin Browser Miner
+        </h1>
+        <p className="text-xl md:text-2xl mt-4 opacity-90 max-w-2xl mx-auto">
           Use your browser to join the Bitcoin mining lottery—learn, explore, and even win!
         </p>
       </header>
 
-      <nav className="bg-gray-800 py-4 text-center space-x-4">
-        <a href="#about" className="hover:text-orange-500">About</a>
-        <a href="#how-it-works" className="hover:text-orange-500">How It Works</a>
-        <a href="#contact" className="hover:text-orange-500">Contact</a>
+      {/* NAV */}
+      <nav className="w-full flex justify-center gap-8 py-6 bg-transparent text-lg font-medium border-b border-[#23233a]">
+        <a href="#about" className="hover:text-[#00eaff] transition-colors">About</a>
+        <a href="#how-it-works" className="hover:text-[#00eaff] transition-colors">How It Works</a>
+        <a href="#contact" className="hover:text-[#00eaff] transition-colors">Contact</a>
       </nav>
 
-      <main className="max-w-3xl mx-auto py-12 px-4 space-y-8">
-        <section className="bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-          {!user && (
-            <div>
-              <p className="mb-4">You are not logged in.</p>
-              <button
-                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded"
-                onClick={login}
-              >
-                Log in
-              </button>
-            </div>
-          )}
-
-          {user && (
-            <div>
-              <p className="mb-4">Signed in as {email}</p>
-              <button
-                className="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded"
-                onClick={logout}
-              >
-                Logout
-              </button>
-            </div>
-          )}
+      <main className="flex-1 w-full">
+        {/* AUTH SECTION */}
+        <section className="w-full py-12 px-4 border-b border-[#23233a] text-center">
+          <div className="max-w-2xl mx-auto">
+            {!user ? (
+              <>
+                <p className="mb-6 text-lg">You are not logged in.</p>
+                <button
+                  className="bg-gradient-to-r from-[#00eaff] to-[#ff00cc] text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform"
+                  onClick={login}
+                >
+                  Log in
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="mb-6 text-lg">
+                  Signed in as <span className="font-semibold">{email}</span>
+                </p>
+                <button
+                  className="bg-[#23233a] text-white font-bold py-2 px-6 rounded-lg border border-[#00eaff] hover:bg-[#2a2a40] transition"
+                  onClick={logout}
+                >
+                  Logout
+                </button>
+              </>
+            )}
+          </div>
         </section>
 
-        <section id="about" className="bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-orange-500 text-2xl border-b-2 border-orange-500 inline-block mb-4">
-            About the Project
-          </h2>
-          <p>
-            Currently under construction, this is an educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly (abbreviated Wasm) technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It’s like entering a lottery—you might win!
-          </p>
+        {/* ABOUT SECTION */}
+        <section id="about" className="w-full py-16 px-4 border-b border-[#23233a]">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+              About the Project
+            </h2>
+            <p className="mt-2 text-lg">
+              Currently under construction, this is an educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly (Wasm) technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It’s like entering a lottery—you might win!
+            </p>
+          </div>
         </section>
 
-        <section id="how-it-works" className="bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-orange-500 text-2xl border-b-2 border-orange-500 inline-block mb-4">
-            How It Works
-          </h2>
-          <ul className="list-disc list-inside space-y-2">
-            <li>Your browser utilizes Wasm to attempt solving the current Bitcoin block.</li>
-            <li>The likelihood of success is very low—but it’s possible!</li>
-            <li>If you successfully mine the block, you’ll receive the full Bitcoin block reward and mining fees, minus a 5% administrative fee and any applicable tax withholdings.</li>
-            <li>Successful miners will be directly contacted to facilitate the reward transfer.</li>
-          </ul>
+        {/* HOW IT WORKS SECTION */}
+        <section id="how-it-works" className="w-full py-16 px-4 border-b border-[#23233a]">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+              How It Works
+            </h2>
+            <ul className="list-disc list-inside space-y-2 text-lg">
+              <li>Your browser utilizes Wasm to attempt solving the current Bitcoin block.</li>
+              <li>The likelihood of success is very low—but it’s possible!</li>
+              <li>If you successfully mine the block, you’ll receive the full Bitcoin block reward and mining fees, minus a 5% administrative fee and any applicable tax withholdings.</li>
+              <li>Successful miners will be directly contacted to facilitate the reward transfer.</li>
+            </ul>
+          </div>
         </section>
 
-        <section id="contact" className="bg-gray-800 rounded-lg shadow-lg p-6">
-          <h2 className="text-orange-500 text-2xl border-b-2 border-orange-500 inline-block mb-4">
-            Contact
-          </h2>
-          <p>Email: info@bitcoinbrowserminer.com</p>
-          <p>Discord: Join our community channel (Coming soon)</p>
+        {/* CONTACT SECTION */}
+        <section id="contact" className="w-full py-16 px-4">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+              Contact
+            </h2>
+            <p className="text-lg">
+              Email: <a href="mailto:info@bitcoinbrowserminer.com" className="text-[#00eaff] underline">info@bitcoinbrowserminer.com</a>
+            </p>
+            <p className="text-lg">
+              Discord: <span className="opacity-70">Join our community channel (Coming soon)</span>
+            </p>
+          </div>
         </section>
       </main>
 
-      <footer className="bg-gray-900 text-center py-4 fixed bottom-0 w-full opacity-80">
-        &copy; 2025 Bitcoin Browser Miner. All rights reserved.
-      </footer>
+      {/* BOTTOM LINKS SECTION */}
+      <FooterLinks />
     </div>
   );
 }
