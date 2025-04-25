@@ -11,21 +11,21 @@ export default function FooterLinks() {
             href="https://github.com/KennyH/mine-bitcoin-online"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center font-bold px-2 py-1 bg-black text-white rounded-sm"
+            className="flex items-center font-bold px-2 py-1 bg-[#0a0c10] text-white rounded-sm"
           >
             <FaGithub className="mr-1" /> GITHUB
           </a>
           <span className="text-[#23233a] mx-1">|</span>
           <a
             href="/privacy"
-            className="flex items-center font-bold px-2 py-1 bg-black text-white rounded-sm"
+            className="flex items-center font-bold px-2 py-1 bg-[#0a0c10] text-white rounded-sm"
           >
             <MdLock className="mr-1" /> PRIVACY
           </a>
           <span className="text-[#23233a] mx-1">|</span>
           <a
             href="/status"
-            className="flex items-center font-bold px-2 py-1 bg-black text-white rounded-sm"
+            className="flex items-center font-bold px-2 py-1 bg-[#0a0c10] text-white rounded-sm"
           >
             <MdCheckCircle className="mr-1" /> STATUS
           </a>
