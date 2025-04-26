@@ -4,6 +4,7 @@ import FooterLinks from './components/FooterLinks';
 import HeaderLinks from './components/HeaderLinks';
 
 export default function Home() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user, email, loading, login, logout } = useAuth();
 
   if (loading) {
