@@ -1,6 +1,7 @@
 'use client';
 import { useAuth } from './context/AmplifyAuthContext';
 import FooterLinks from './components/FooterLinks';
+import HeaderLinks from './components/HeaderLinks';
 
 export default function Home() {
   const { user, email, loading, login, logout } = useAuth();
@@ -16,7 +17,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0c10] text-[#e0e6ed] font-sans">
       {/* HEADER */}
-      <header className="w-full py-16 px-4 bg-gradient-to-br from-[#00eaff] via-[#1a1a2e] to-[#ff00cc] text-center shadow-lg">
+      <HeaderLinks/>
+      <header className="w-full py-16 px-4 bg-gradient-to-br from-[#00eaff] via-[#1a1a2e] to-[#f7931a] text-center shadow-lg">
         <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white">
           Bitcoin Browser Miner
         </h1>
@@ -33,35 +35,6 @@ export default function Home() {
       </nav>
 
       <main className="flex-1 w-full">
-        {/* AUTH SECTION */}
-        <section className="w-full py-12 px-4 border-b border-[#23233a] text-center">
-          <div className="max-w-2xl mx-auto">
-            {!user ? (
-              <>
-                <p className="mb-6 text-lg">You are not logged in.</p>
-                <button
-                  className="bg-gradient-to-r from-[#00eaff] to-[#ff00cc] text-white font-bold py-2 px-6 rounded-lg shadow-lg hover:scale-105 transition-transform"
-                  onClick={login}
-                >
-                  Log in
-                </button>
-              </>
-            ) : (
-              <>
-                <p className="mb-6 text-lg">
-                  Signed in as <span className="font-semibold">{email}</span>
-                </p>
-                <button
-                  className="bg-[#23233a] text-white font-bold py-2 px-6 rounded-lg border border-[#00eaff] hover:bg-[#2a2a40] transition"
-                  onClick={logout}
-                >
-                  Logout
-                </button>
-              </>
-            )}
-          </div>
-        </section>
-
         {/* ABOUT SECTION */}
         <section id="about" className="w-full py-16 px-4 border-b border-[#23233a]">
           <div className="max-w-2xl mx-auto">
