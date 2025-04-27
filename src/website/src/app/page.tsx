@@ -1,7 +1,8 @@
 'use client';
 import { useAuth } from './context/AmplifyAuthContext';
-import FooterLinks from './components/FooterLinks';
-import HeaderLinks from './components/HeaderLinks';
+import PageBanner from './components/PageBanner';
+import PageHeader from './components/PageHeader';
+import PageFooter from './components/PageFooter';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,15 +19,8 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0a0c10] text-[#e0e6ed] font-sans">
       {/* HEADER */}
-      <HeaderLinks/>
-      <header className="w-full py-16 px-4 bg-gradient-to-br from-[#00eaff] via-[#1a1a2e] to-[#f7931a] text-center shadow-lg">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-white">
-          Bitcoin Browser Miner
-        </h1>
-        <p className="text-xl md:text-2xl mt-4 opacity-90 max-w-2xl mx-auto">
-          Use your browser to join the Bitcoin mining lottery—learn, explore, and even win!
-        </p>
-      </header>
+      <PageHeader/>
+      <PageBanner showTagline = {true} />
 
       {/* NAV */}
       <nav className="w-full flex justify-center gap-8 py-6 bg-transparent text-lg font-medium border-b border-[#23233a]">
@@ -43,7 +37,7 @@ export default function Home() {
               About the Project
             </h2>
             <p className="mt-2 text-lg">
-              Currently under construction, this is an educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly (Wasm) technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It’s like entering a lottery—you might win!
+              Currently under construction, this is an educational project allowing users to participate in Bitcoin mining using their browser through WebAssembly (Wasm) technology. The goal is to offer users an easy, engaging way to learn about blockchain technology, Bitcoin mining, and decentralization. It’s like entering a lottery—you might even win!
             </p>
           </div>
         </section>
@@ -79,8 +73,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* BOTTOM LINKS SECTION */}
-      <FooterLinks />
+      <PageFooter />
     </div>
   );
 }

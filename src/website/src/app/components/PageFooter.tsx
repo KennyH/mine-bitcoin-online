@@ -1,7 +1,7 @@
 import { FaGithub } from "react-icons/fa";
 import { MdCheckCircle, MdLock } from "react-icons/md";
 
-export default function FooterLinks() {
+export default function PageFooter() {
   return (
     <section className="w-full border-t border-[#23233a] bg-[#0a0c10]">
       <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 py-6 px-4 text-sm">

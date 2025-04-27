@@ -3,7 +3,38 @@ import Image from "next/image";
 import Link from "next/link";
 import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
 
-export default function HeaderLinks() {
+type NavLinkProps = {
+  href: string;
+  label: string;
+  show?: "md" | "lg";
+  className?: string;
+  [key: string]: any;
+};
+
+const navLinks: NavLinkProps[] = [
+  { href: "/get-started", label: "Get Started", show: "md" },
+  { href: "/learn", label: "Learn", show: "lg" },
+  { href: "/faq", label: "FAQ", show: "lg" },
+];
+
+function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) {
+  let visibility = "";
+  if (show === "md") visibility = "hidden md:inline";
+  else if (show === "lg") visibility = "hidden lg:inline";
+  else visibility = "inline";
+
+  return (
+    <Link
+      href={href}
+      className={`${visibility} text-white font-medium hover:text-[#00eaff] transition-colors ${className}`}
+      {...props}
+    >
+      {label}
+    </Link>
+  );
+}
+
+export default function PageHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -28,13 +59,8 @@ export default function HeaderLinks() {
           </span>
         </Link>
 
-        {/* Center: Start Mining Button (centered on md+ and up, hidden below md) */}
-        <div
-          className={`
-            hidden md:block
-            absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-          `}
-        >
+        {/* Center: Start Mining Button (md+) */}
+        <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <Link
             href="/start"
             className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-2 py-2 rounded shadow hover:scale-105 transition-transform"
@@ -45,27 +71,19 @@ export default function HeaderLinks() {
 
         {/* Right: Nav links, Start Mining (on <md), search, hamburger */}
         <nav className="flex items-center gap-5 z-20">
-          {/* "Get Started" - hidden on <md */}
-          <Link
-            href="/get-started"
-            className="hidden md:inline text-white font-medium hover:text-[#00eaff] transition-colors"
-          >
-            Get Started
-          </Link>
-          {/* "Blog" - hidden on <lg */}
-          <Link
-            href="/blog"
-            className="hidden lg:inline text-white font-medium hover:text-[#00eaff] transition-colors"
-          >
-            Blog
-          </Link>
-          {/* Start Mining reduced to Start (on <md, right-aligned) */}
+          {/* Map over navLinks */}
+          {navLinks.map((link) => (
+            <NavLink key={link.href} {...link} />
+          ))}
+
+          {/* Start Mining reduced to Start (on <md) */}
           <Link
             href="/start"
             className="md:hidden bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-1 py-2 rounded shadow hover:scale-105 transition-transform"
           >
             Start
           </Link>
+
           {/* Search always visible */}
           <Link
             href="/search"
@@ -74,12 +92,10 @@ export default function HeaderLinks() {
           >
             <FaSearch className="text-white text-lg" />
           </Link>
-          {/* Hamburger menu: visible if "Blog" is hidden (at <lg) */}
+
+          {/* Hamburger menu: visible if "Learn" is hidden (at <lg) */}
           <button
-            className={`
-              p-2 ml-1 rounded hover:bg-[#23233a] transition
-              lg:hidden
-            `}
+            className="p-2 ml-1 rounded hover:bg-[#23233a] transition lg:hidden"
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
@@ -97,20 +113,17 @@ export default function HeaderLinks() {
             >
               <FaTimes className="text-white text-2xl" />
             </button>
-            <Link
-              href="/get-started"
-              className="mb-4 text-white text-lg font-medium hover:text-[#00eaff] transition-colors md:hidden"
-              onClick={() => setMenuOpen(false)}
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/blog"
-              className="mb-4 text-white text-lg font-medium hover:text-[#00eaff] transition-colors lg:hidden"
-              onClick={() => setMenuOpen(false)}
-            >
-              Blog
-            </Link>
+            {/* Show all links in mobile menu */}
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="mb-4 text-white text-lg font-medium hover:text-[#00eaff] transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
         )}
       </div>
