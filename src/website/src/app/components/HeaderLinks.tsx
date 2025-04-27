@@ -16,10 +16,15 @@ export default function HeaderLinks() {
             alt="Bitcoin Logo"
             width={32}
             height={32}
-            className="rounded"
+            className="rounded w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8"
           />
-          <span className="truncate text-xl font-bold text-white group-hover:text-[#00eaff] transition-colors">
+          {/* Desktop/Tablet Title */}
+          <span className="truncate font-bold text-white group-hover:text-[#00eaff] transition-colors text-xl sm:text-lg md:text-xl hidden md:inline">
             Bitcoin Browser Miner
+          </span>
+          {/* Mobile Title */}
+          <span className="truncate font-bold text-white group-hover:text-[#00eaff] transition-colors text-base sm:text-lg md:text-xl inline md:hidden">
+            BTC Browser Miner
           </span>
         </Link>
 
@@ -54,12 +59,12 @@ export default function HeaderLinks() {
           >
             Blog
           </Link>
-          {/* Start Mining (on <md, right-aligned) */}
+          {/* Start Mining reduced to Start (on <md, right-aligned) */}
           <Link
             href="/start"
             className="md:hidden bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-1 py-2 rounded shadow hover:scale-105 transition-transform"
           >
-            Start Mining
+            Start
           </Link>
           {/* Search always visible */}
           <Link
@@ -69,7 +74,7 @@ export default function HeaderLinks() {
           >
             <FaSearch className="text-white text-lg" />
           </Link>
-          {/* Hamburger menu: visible if "Blog" is hidden (i.e., <lg) */}
+          {/* Hamburger menu: visible if "Blog" is hidden (at <lg) */}
           <button
             className={`
               p-2 ml-1 rounded hover:bg-[#23233a] transition
@@ -92,7 +97,6 @@ export default function HeaderLinks() {
             >
               <FaTimes className="text-white text-2xl" />
             </button>
-            {/* Show links that are hidden at this breakpoint */}
             <Link
               href="/get-started"
               className="mb-4 text-white text-lg font-medium hover:text-[#00eaff] transition-colors md:hidden"
