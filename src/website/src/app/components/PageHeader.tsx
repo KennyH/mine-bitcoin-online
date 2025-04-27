@@ -8,7 +8,6 @@ type NavLinkProps = {
   label: string;
   show?: "md" | "lg";
   className?: string;
-  [key: string]: any;
 };
 
 const navLinks: NavLinkProps[] = [
