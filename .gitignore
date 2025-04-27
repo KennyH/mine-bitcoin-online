@@ -148,3 +148,6 @@ crash.log
 # Ignore sensitive variable files
 *.tfvars
 *.tfvars.json
+
+# Ignore test results
+**/test-results/
