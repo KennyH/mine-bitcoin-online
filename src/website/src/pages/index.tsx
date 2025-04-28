@@ -16,7 +16,7 @@ export default function Home() {
   }
 
   return (
-    <Layout showTagline = {true}>
+    <>
       <nav className="w-full flex justify-center gap-8 py-6 bg-transparent text-lg font-medium border-b border-[#23233a]">
         <a href="#about" className="hover:text-[#00eaff] transition-colors">About</a>
         <a href="#how-it-works" className="hover:text-[#00eaff] transition-colors">How It Works</a>
@@ -66,6 +66,10 @@ export default function Home() {
           </div>
         </section>
       </main>
-    </Layout>
+    </>
   );
 }
+
+// Attach Layout settings
+Home.showBanner = true;
+Home.showTagline = true;

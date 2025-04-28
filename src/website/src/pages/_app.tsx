@@ -1,17 +1,30 @@
 import type { AppProps } from "next/app";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import AmplifyConfig from "../config/AmplifyConfig";
-import { AmplifyAuthProvider } from "../context/AmplifyAuthContext";
+import AmplifyConfig from "@/config/AmplifyConfig"
+import { AmplifyAuthProvider } from "@/context/AmplifyAuthContext";
+import Layout from "@/components/Layout";
 
+type WithLayoutSettings = {
+  showBanner?: boolean;
+  showTagline?: boolean;
+};
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+type AppWithLayoutProps = AppProps & {
+  Component: AppProps["Component"] & WithLayoutSettings;
+};
+
+export default function MyApp({ Component, pageProps }: AppWithLayoutProps) {
+  const showBanner = (Component as any).showBanner ?? true;
+  const showTagline = (Component as any).showTagline ?? false;
   return (
-    <div className={`${GeistSans.className} font-sans`}>
-      <AmplifyConfig />
-      <AmplifyAuthProvider>
-        <Component {...pageProps} />
-      </AmplifyAuthProvider>
-    </div>
+    <Layout showBanner={showBanner} showTagline={showTagline}>
+      <div className={`${GeistSans.className} font-sans`}>
+        <AmplifyConfig />
+        <AmplifyAuthProvider>
+          <Component {...pageProps} />
+        </AmplifyAuthProvider>
+      </div>
+    </Layout>
   );
 }
