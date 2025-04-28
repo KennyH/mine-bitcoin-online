@@ -12,9 +12,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
-    }
+    # s3_origin_config {
+    #   origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
+    # }
   }
 
   enabled             = true
