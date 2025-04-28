@@ -15,7 +15,7 @@ export default function Custom404() {
           404 - Not Found
         </h1>
         <p className="text-lg mb-8 text-center">
-          These aren’t the droids you're looking for.
+          These aren’t the droids you’re looking for.
         </p>
         <button
           onClick={() => router.back()}
