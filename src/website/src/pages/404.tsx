@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/router';
-import Layout from '@/components/Layout';
 
 export default function Custom404() {
   const router = useRouter();
