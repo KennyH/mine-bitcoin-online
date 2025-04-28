@@ -26,7 +26,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
       # Principal = {
       #   AWS = aws_cloudfront_origin_access_identity.origin_identity.iam_arn
       # }
-      # Principal = "*"
+      Principal = "*"
       Action   = ["s3:GetObject"]
       Resource = ["${aws_s3_bucket.frontend_bucket.arn}/*"]
     }]
