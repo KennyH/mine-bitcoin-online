@@ -1,15 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/router';
-import PageHeader from '@/components/PageHeader';
-import PageFooter from '@/components/PageFooter';
+import Layout from '@/components/Layout';
 
 export default function Custom404() {
   const router = useRouter();
 
   return (
-    <>
-      <PageHeader/>
+    <Layout showBanner={false}>
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0a0c10] text-[#e0e6ed] font-sans px-4">
         <h1 className="text-2xl font-bold mb-2">
           404 - Not Found
@@ -24,7 +22,6 @@ export default function Custom404() {
           Go Back
         </button>
       </div>
-      <PageFooter/>
-    </>
+    </Layout>
   );
 }

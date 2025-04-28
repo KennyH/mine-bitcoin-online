@@ -1,9 +1,8 @@
 'use client';
 
 import { useAuth } from '../context/AmplifyAuthContext';
+import Layout from '../components/Layout';
 import PageBanner from '../components/PageBanner';
-import PageHeader from '../components/PageHeader';
-import PageFooter from '../components/PageFooter';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -18,9 +17,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0a0c10] text-[#e0e6ed] font-sans">
-      <PageHeader/>
-      <PageBanner showTagline = {true} />
+    <Layout showTagline = {true}>
       <nav className="w-full flex justify-center gap-8 py-6 bg-transparent text-lg font-medium border-b border-[#23233a]">
         <a href="#about" className="hover:text-[#00eaff] transition-colors">About</a>
         <a href="#how-it-works" className="hover:text-[#00eaff] transition-colors">How It Works</a>
@@ -70,8 +67,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      <PageFooter />
-    </div>
+    </Layout>
   );
 }

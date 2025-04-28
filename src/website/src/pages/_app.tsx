@@ -7,7 +7,7 @@ import { AmplifyAuthProvider } from "../context/AmplifyAuthContext";
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <div className={`${GeistSans.className} min-h-screen flex flex-col bg-[#0a0c10] text-[#e0e6ed]`}>
+    <div className={`${GeistSans.className} font-sans`}>
       <AmplifyConfig />
       <AmplifyAuthProvider>
         <Component {...pageProps} />
