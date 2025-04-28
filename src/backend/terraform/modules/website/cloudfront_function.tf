@@ -34,11 +34,18 @@ function handler(event) {
         return request;
     }
 
-    // Handle trailingSlash = true correctly:
+    // Handle trailingSlash = true:
     // - If path doesn't end in "/", append "/index.html"
     // - If path already ends in "/", append "index.html"
     if (!uri.endsWith('/')) {
-        uri += '/';
+        var response = {
+            statusCode: 301,
+            statusDescription: 'Moved Permanently',
+            headers: {
+                "location": { "value": uri + "/" }
+            }
+        };
+        return response;
     }
 
     request.uri = uri + 'index.html';
