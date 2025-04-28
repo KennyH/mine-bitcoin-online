@@ -2,6 +2,15 @@ resource "aws_cloudfront_origin_access_identity" "origin_identity" {
   comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
 }
 
+#new
+resource "aws_cloudfront_origin_access_control" "frontend_oac" {
+  name                              = "frontend-oac-${var.environment}"
+  description                       = "OAC for mine-bitcoin-online-frontend-${var.environment}"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
+  origin_access_control_origin_type = "s3"
+}
+
 # https://github.com/tenable/terrascan/blob/master/docs/policies/aws.md
 
 #ts:skip=AC_AWS_0032 Ensure CloudFront has WAF enabled (cost issue)
