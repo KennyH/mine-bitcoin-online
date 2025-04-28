@@ -32,8 +32,8 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
-
-    origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
+    #can't do this with s3 webhost :`(
+    #origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
   }
 
   enabled             = true
