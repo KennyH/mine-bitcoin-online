@@ -49,10 +49,10 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     default_ttl = 3600    # 1 hour
     max_ttl     = 86400   # 1 day
 
-    # function_association {
-    #   event_type   = "viewer-request"
-    #   function_arn = aws_cloudfront_function.redirect_and_add_index_html.arn
-    # }
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.redirect_and_add_index_html.arn
+    }
   }
 
   restrictions {

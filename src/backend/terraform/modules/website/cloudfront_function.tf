@@ -19,6 +19,13 @@ function handler(event) {
         uri = '/';
     }
 
+    // If URI looks like a static file (has a .xxx extension), leave it alone
+    if (uri.match(/\.[a-zA-Z0-9]+$/)) {
+        request.uri = uri;
+        return request;
+    }
+
+    // else it is a page, so put an ending slash on it
     if (!uri.endsWith('/')) {
         uri += '/';
     }
