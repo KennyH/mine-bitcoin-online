@@ -20,6 +20,18 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   enabled             = true
   default_root_object = "index.html"
 
+  custom_error_response {
+    error_code         = 404
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+
+  custom_error_response {
+    error_code         = 403
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
@@ -52,7 +64,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
   }
 
   aliases = var.domain_name != "" ? [var.domain_name] : []
-
   comment = var.domain_name != "" ? "${var.environment} env for bitcoin browser miner site" : null
 
   tags = {
