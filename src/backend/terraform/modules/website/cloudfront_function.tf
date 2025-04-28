@@ -19,7 +19,13 @@ function handler(event) {
         uri = '/';
     }
 
-    // If URI looks like a static file (has a .xxx extension), leave it alone
+    // skip rewrite for known static folders
+    if (uri.startsWith('/_next/') || uri.startsWith('/static/') || uri.startsWith('/assets/') || uri.startsWith('/media/')) {
+        request.uri = uri;
+        return request;
+    }
+
+    // skip rewriting if the path looks like a file (has a file extension)
     if (uri.match(/\.[a-zA-Z0-9]+$/)) {
         request.uri = uri;
         return request;
