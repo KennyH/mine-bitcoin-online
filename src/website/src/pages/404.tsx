@@ -22,6 +22,3 @@ export default function Custom404() {
     </div>
   );
 }
-
-// Attach Layout settings
-Custom404.showBanner = false;

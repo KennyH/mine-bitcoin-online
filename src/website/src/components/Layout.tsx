@@ -9,7 +9,7 @@ type LayoutProps = {
   showTagline?: boolean;
 };
 
-export default function Layout({ children, showBanner = true, showTagline }: LayoutProps) {
+export default function Layout({ children, showBanner = true, showTagline = false }: LayoutProps) {
   function renderBanner() {
     if (!showBanner) return null;
     return <PageBanner showTagline={showTagline} />;
