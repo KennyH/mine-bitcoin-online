@@ -12,18 +12,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
-    # custom_origin_config {
-    #   http_port              = 80
-    #   https_port             = 443
-    #   origin_protocol_policy = "http-only"
-    #   origin_ssl_protocols   = ["TLSv1.2"]
-    # }
-    ## Not using OAI, as it will require cloud functions to map the subpages
-    ## correctly, and it isn't worth the cost (the cost is small, but I'd like
-    ## to keep costs at absolute minimum). Since this website will be open
-    ## sourced anyway, there isn't any data that needs to be secure by keeping
-    ## the S3 bucket private.
-
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
     }
@@ -60,6 +48,11 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.add_index_html.arn
+    }
   }
 
   restrictions {
