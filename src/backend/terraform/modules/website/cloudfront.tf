@@ -45,13 +45,13 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
+    min_ttl     = 300     # 5 minutes
+    default_ttl = 3600    # 1 hour
+    max_ttl     = 86400   # 1 day
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.add_index_html.arn
+      function_arn = aws_cloudfront_function.redirect_and_add_index_html.arn
     }
   }
 

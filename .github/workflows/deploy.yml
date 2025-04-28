@@ -128,7 +128,20 @@ jobs:
 
       - name: Deploy to S3 bucket
         run: |
-          aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
+           aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
+
+          #  TODO: Uncomment when close to launching prod
+          #  # Step 1: Upload HTML with short cache
+          #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
+          #    --exclude "*" \
+          #    --include "*.html" \
+          #    --cache-control "public, max-age=60" \
+          #    --delete
+
+          #  # Step 2: Upload other assets with long cache
+          #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
+          #    --exclude "*.html" \
+          #    --cache-control "public, max-age=31536000, immutable"
 
       - name: Invalidate CloudFront Distribution
         run: |
