@@ -11,16 +11,19 @@ function handler(event) {
     // Normalize multiple slashes
     uri = uri.replace(/\/{2,}/g, '/');
 
-    // Remove all trailing slashes
-    uri = uri.replace(/\/+$/, '');
-
-    // If URI is empty, set it to "/"
-    if (uri === '') {
-        uri = '/';
+    // Remove all trailing slashes, except for root
+    if (uri !== '/') {
+        uri = uri.replace(/\/+$/, '');
     }
 
-    // skip rewrite for known static folders
+    // skip rewrite for static folders
     if (uri.startsWith('/_next/') || uri.startsWith('/static/') || uri.startsWith('/assets/') || uri.startsWith('/media/')) {
+        request.uri = uri;
+        return request;
+    }
+
+    // skip rewrite for static root files
+    if (uri.match(/^\/[^\/]+\.(ico|png|jpg|jpeg|svg|gif|txt|xml|json|webmanifest)$/)) {
         request.uri = uri;
         return request;
     }
@@ -31,7 +34,9 @@ function handler(event) {
         return request;
     }
 
-    // else it is a page, so put an ending slash on it
+    // Handle trailingSlash = true correctly:
+    // - If path doesn't end in "/", append "/index.html"
+    // - If path already ends in "/", append "index.html"
     if (!uri.endsWith('/')) {
         uri += '/';
     }
