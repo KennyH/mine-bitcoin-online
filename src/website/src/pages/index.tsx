@@ -2,7 +2,6 @@
 
 import { useAuth } from '../context/AmplifyAuthContext';
 import Layout from '../components/Layout';
-import PageBanner from '../components/PageBanner';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
