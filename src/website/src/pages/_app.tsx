@@ -15,8 +15,8 @@ type AppWithLayoutProps = AppProps & {
 };
 
 export default function MyApp({ Component, pageProps }: AppWithLayoutProps) {
-  const showBanner = (Component as any).showBanner ?? true;
-  const showTagline = (Component as any).showTagline ?? false;
+  const showBanner = Component.showBanner ?? true;
+  const showTagline = Component.showTagline ?? false;
   return (
     <Layout showBanner={showBanner} showTagline={showTagline}>
       <div className={`${GeistSans.className} font-sans`}>
