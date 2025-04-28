@@ -7,24 +7,23 @@ resource "aws_cloudfront_function" "redirect_and_add_index_html" {
 function handler(event) {
     var request = event.request;
     var uri = request.uri;
-    var querystring = request.querystring;
 
-    if (!uri.endsWith('/')) {
-        var location = uri + "/";
-        if (querystring && querystring.length > 0) {
-            location += "?" + querystring;
-        }
+    // Normalize multiple slashes
+    uri = uri.replace(/\/{2,}/g, '/');
 
-        return {
-            statusCode: 301,
-            statusDescription: 'Moved Permanently',
-            headers: {
-                "location": { "value": location }
-            }
-        };
+    // Remove all trailing slashes
+    uri = uri.replace(/\/+$/, '');
+
+    // If URI is empty, set it to "/"
+    if (uri === '') {
+        uri = '/';
     }
 
-    request.uri += 'index.html';
+    if (!uri.endsWith('/')) {
+        uri += '/';
+    }
+
+    request.uri = uri + 'index.html';
     return request;
 }
 EOT
