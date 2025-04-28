@@ -24,9 +24,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     ## sourced anyway, there isn't any data that needs to be secure by keeping
     ## the S3 bucket private.
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
-    }
+    # s3_origin_config {
+    #   origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
+    # }
   }
 
   enabled             = true
