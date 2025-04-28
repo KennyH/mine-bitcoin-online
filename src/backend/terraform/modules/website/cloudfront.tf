@@ -12,12 +12,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-    }
+    # custom_origin_config {
+    #   http_port              = 80
+    #   https_port             = 443
+    #   origin_protocol_policy = "http-only"
+    #   origin_ssl_protocols   = ["TLSv1.2"]
+    # }
     ## Not using OAI, as it will require cloud functions to map the subpages
     ## correctly, and it isn't worth the cost (the cost is small, but I'd like
     ## to keep costs at absolute minimum). Since this website will be open
