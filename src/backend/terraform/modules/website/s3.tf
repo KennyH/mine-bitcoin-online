@@ -28,22 +28,49 @@ resource "aws_s3_bucket_versioning" "frontend_bucket_versioning" {
   }
 }
 
+#new
 resource "aws_s3_bucket_policy" "bucket_policy" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect = "Allow"
-      # Principal = {
-      #   AWS = aws_cloudfront_origin_access_identity.origin_identity.iam_arn
-      # }
-      Principal = "*"
-      Action   = ["s3:GetObject"]
-      Resource = ["${aws_s3_bucket.frontend_bucket.arn}/*"]
-    }]
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontAccessOnly"
+        Effect = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action = "s3:GetObject"
+        Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}"
+          }
+        }
+      }
+    ]
   })
 }
+
+data "aws_caller_identity" "current" {}
+
+# resource "aws_s3_bucket_policy" "bucket_policy" {
+#   bucket = aws_s3_bucket.frontend_bucket.id
+
+#   policy = jsonencode({
+#     Version = "2012-10-17"
+#     Statement = [{
+#       Effect = "Allow"
+#       # Principal = {
+#       #   AWS = aws_cloudfront_origin_access_identity.origin_identity.iam_arn
+#       # }
+#       Principal = "*"
+#       Action   = ["s3:GetObject"]
+#       Resource = ["${aws_s3_bucket.frontend_bucket.arn}/*"]
+#     }]
+#   })
+# }
 
 resource "aws_s3_bucket_public_access_block" "public_block" {
   bucket                  = aws_s3_bucket.frontend_bucket.id
