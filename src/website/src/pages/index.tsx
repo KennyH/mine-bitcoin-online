@@ -1,7 +1,6 @@
 'use client';
 
 import { useAuth } from '../context/AmplifyAuthContext';
-import Layout from '../components/Layout';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

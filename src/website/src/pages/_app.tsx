@@ -14,7 +14,7 @@ type AppWithLayoutProps = AppProps & {
   Component: AppProps["Component"] & WithLayoutSettings;
 };
 
-export default function MyApp({ Component, pageProps }: AppWithLayoutProps) {
+export default function App({ Component, pageProps }: AppWithLayoutProps) {
   const showBanner = Component.showBanner ?? true;
   const showTagline = Component.showTagline ?? false;
   return (
