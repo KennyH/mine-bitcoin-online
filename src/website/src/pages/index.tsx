@@ -1,4 +1,6 @@
 'use client';
+
+import Head from "next/head";
 import { useAuth } from './context/AmplifyAuthContext';
 import PageBanner from './components/PageBanner';
 import PageHeader from './components/PageHeader';

@@ -99,6 +99,10 @@ jobs:
           NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
         run: npm run build
+    
+      - name: Export Next.js static site
+        working-directory: src/website
+        run: npm run export
 
       - name: Adding extended robots.txt for dev environment
         if: ${{ inputs.environment == 'dev' }}

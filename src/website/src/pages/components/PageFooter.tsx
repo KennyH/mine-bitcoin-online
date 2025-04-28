@@ -18,7 +18,7 @@ export default function PageFooter() {
           </a>
           <span className="text-[#23233a] mx-1">|</span>
           <Link
-            href="/privacy"
+            href="/docs/privacy"
             className="flex items-center font-bold px-2 py-1 bg-[#0a0c10] text-white rounded-sm"
             aria-label="Privacy"
           >
