@@ -1,6 +1,6 @@
-# resource "aws_cloudfront_origin_access_identity" "origin_identity" {
-#   comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
-# }
+resource "aws_cloudfront_origin_access_identity" "origin_identity" {
+  comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
+}
 
 # https://github.com/tenable/terrascan/blob/master/docs/policies/aws.md
 
