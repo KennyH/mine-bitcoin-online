@@ -34,9 +34,7 @@ function handler(event) {
         return request;
     }
 
-    // Handle trailingSlash = true:
-    // - If path doesn't end in "/", append "/index.html"
-    // - If path already ends in "/", append "index.html"
+    // when no slash, redirect to slash-version
     if (!uri.endsWith('/')) {
         var response = {
             statusCode: 301,
