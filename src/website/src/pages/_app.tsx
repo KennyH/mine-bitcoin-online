@@ -1,8 +1,8 @@
 import type { AppProps } from "next/app";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import AmplifyConfig from "./AmplifyConfig";
-import { AmplifyAuthProvider } from "./context/AmplifyAuthContext";
+import AmplifyConfig from "../config/AmplifyConfig";
+import { AmplifyAuthProvider } from "../context/AmplifyAuthContext";
 
 
 export default function MyApp({ Component, pageProps }: AppProps) {

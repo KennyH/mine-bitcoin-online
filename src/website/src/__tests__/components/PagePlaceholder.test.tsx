@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import PagePlaceholder from '@/pages/components/PagePlaceholder';
+import PagePlaceholder from '@/components/PagePlaceholder';
 
 describe('PagePlaceholder', () => {
   it('renders the title', () => {

@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from './context/AmplifyAuthContext';
-import PageBanner from './components/PageBanner';
-import PageHeader from './components/PageHeader';
-import PageFooter from './components/PageFooter';
+import { useAuth } from '../context/AmplifyAuthContext';
+import PageBanner from '../components/PageBanner';
+import PageHeader from '../components/PageHeader';
+import PageFooter from '../components/PageFooter';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
