@@ -34,20 +34,12 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
+    Statement: [
       {
-        Sid    = "AllowCloudFrontAccessOnly"
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action = "s3:GetObject"
-        Resource = "${aws_s3_bucket.frontend_bucket.arn}/*"
-        Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.frontend_distribution.id}"
-          }
-        }
+        Effect: "Allow",
+        Principal: "*",
+        Action: "s3:GetObject",
+        Resource: "${aws_s3_bucket.frontend_bucket.arn}/*"
       }
     ]
   })
@@ -74,8 +66,8 @@ data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_public_access_block" "public_block" {
   bucket                  = aws_s3_bucket.frontend_bucket.id
-  block_public_acls       = false
-  block_public_policy     = false ##
-  ignore_public_acls      = false
-  restrict_public_buckets = false
+  block_public_acls       = true    # use bucket policy only
+  block_public_policy     = false   # public read policy above
+  ignore_public_acls      = true    # ignore object ACLs
+  restrict_public_buckets = false   # public read policy above
 }
