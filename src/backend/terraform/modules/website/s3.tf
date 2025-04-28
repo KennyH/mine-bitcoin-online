@@ -7,6 +7,19 @@ resource "aws_s3_bucket" "frontend_bucket" {
   }
 }
 
+#new
+resource "aws_s3_bucket_website_configuration" "frontend_bucket_website" {
+  bucket = aws_s3_bucket.frontend_bucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+
+  error_document {
+    key = "404.html"
+  }
+}
+
 resource "aws_s3_bucket_versioning" "frontend_bucket_versioning" {
   bucket = aws_s3_bucket.frontend_bucket.id
 
