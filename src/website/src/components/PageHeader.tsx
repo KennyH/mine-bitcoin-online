@@ -47,7 +47,7 @@ export default function PageHeader() {
           {/* Logo and Title */}
           <Link href="/" className="flex items-center gap-2 group z-20 min-w-0">
             <Image
-              src="/bitcoin.png"
+              src="/images/bitcoin.png"
               alt="Bitcoin Logo"
               width={32}
               height={32}

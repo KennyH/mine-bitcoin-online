@@ -16,11 +16,13 @@ export type PageSettings = {
       layoutVariant: "full",
     },
     "/search": {
+      showBanner: false,
       pageTitle: "Search",
       metaDescription: "Search the whole site.",
       layoutVariant: "minimal",
     },
     "/404": {
+      showBanner: false,
       pageTitle: "404 - Not found",
       metaDescription: "Sorry, this page does not exist.",
       layoutVariant: "minimal",
