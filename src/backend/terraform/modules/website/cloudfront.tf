@@ -1,16 +1,3 @@
-# resource "aws_cloudfront_origin_access_identity" "origin_identity" {
-#   comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
-# }
-
-# #new
-# resource "aws_cloudfront_origin_access_control" "frontend_oac" {
-#   name                              = "frontend-oac-${var.environment}"
-#   description                       = "OAC for mine-bitcoin-online-frontend-${var.environment}"
-#   signing_behavior                  = "always"
-#   signing_protocol                  = "sigv4"
-#   origin_access_control_origin_type = "s3"
-# }
-
 # https://github.com/tenable/terrascan/blob/master/docs/policies/aws.md
 
 #ts:skip=AC_AWS_0032 Ensure CloudFront has WAF enabled (cost issue)
@@ -21,19 +8,12 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     domain_name = "${aws_s3_bucket.frontend_bucket.bucket}.s3-website-${var.aws_region}.amazonaws.com"
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
-    # s3_origin_config {
-    #   origin_access_identity = aws_cloudfront_origin_access_identity.origin_identity.cloudfront_access_identity_path
-    # }
-
-    #new
     custom_origin_config {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "http-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
-    #can't do this with s3 webhost :`(
-    #origin_access_control_id = aws_cloudfront_origin_access_control.frontend_oac.id
   }
 
   enabled             = true
@@ -67,11 +47,6 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     min_ttl     = 300     # 5 minutes
     default_ttl = 3600    # 1 hour
     max_ttl     = 86400   # 1 day
-
-    # function_association {
-    #   event_type   = "viewer-request"
-    #   function_arn = aws_cloudfront_function.redirect_and_add_index_html.arn
-    # }
   }
 
   restrictions {
