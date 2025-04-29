@@ -22,3 +22,10 @@ body {
   box-shadow: 0 4px 32px 0 rgba(0, 234, 255, 0.08);
   backdrop-filter: blur(8px);
 }
+
+.noselect {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-tap-highlight-color: transparent; /* Removes grey tap highlight */
+}

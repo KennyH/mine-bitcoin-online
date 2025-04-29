@@ -26,7 +26,7 @@ function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) 
   return (
     <Link
       href={href}
-      className={`${visibilityClass} text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out ${className}`}
+      className={`${visibilityClass} noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out ${className}`}
       {...props}
     >
       {label}
@@ -51,14 +51,14 @@ export default function PageHeader() {
               alt="Bitcoin Logo"
               width={32}
               height={32}
-              className="rounded w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8"
+              className="noselect rounded w-8 h-8 sm:w-7 sm:h-7 md:w-8 md:h-8"
             />
             {/* Desktop/Tablet Title */}
-            <span className="truncate font-bold text-white group-hover:text-[#f7931a] transition-colors text-xl sm:text-lg md:text-xl hidden md:inline">
+            <span className="noselect truncate font-bold text-white group-hover:text-[#f7931a] transition-colors text-xl sm:text-lg md:text-xl hidden md:inline">
               Bitcoin Browser Miner
             </span>
             {/* Mobile Title */}
-            <span className="truncate font-bold text-white group-hover:text-[#f7931a] transition-colors text-base sm:text-lg md:text-xl inline md:hidden">
+            <span className="noselect truncate font-bold text-white group-hover:text-[#f7931a] transition-colors text-base sm:text-lg md:text-xl inline md:hidden">
               BTC Miner
             </span>
           </Link>
@@ -67,7 +67,7 @@ export default function PageHeader() {
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link
               href="/start"
-              className="inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
             >
               Start Mining
             </Link>
@@ -83,7 +83,7 @@ export default function PageHeader() {
             {/* Start Mining reduced to Start (on <md) */}
             <Link
               href="/start"
-              className="md:hidden inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
             >
               Start
             </Link>
@@ -91,7 +91,7 @@ export default function PageHeader() {
             {/* Search always visible */}
             <Link
               href="/search"
-              className="p-2 rounded hover:bg-[#23233a] inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              className="noselect p-2 rounded hover:bg-[#23233a] inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
               aria-label="Search"
             >
               <FaSearch className="text-white text-lg" />
@@ -99,7 +99,7 @@ export default function PageHeader() {
 
             {/* Hamburger menu: visible if "Learn" is hidden (at <lg) */}
             <button
-              className="p-2 ml-1 rounded hover:bg-[#23233a] lg:hidden inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              className="noselect p-2 ml-1 rounded hover:bg-[#23233a] lg:hidden inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
             >
@@ -122,7 +122,7 @@ export default function PageHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                  className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}

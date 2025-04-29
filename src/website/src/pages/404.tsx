@@ -33,7 +33,7 @@ export default function Custom404() {
           </p>
           <button
             onClick={() => router.back()}
-            className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-6 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-transform duration-300 ease-in-out"
+            className="noselect bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-6 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-transform duration-300 ease-in-out"
           >
             Go Back
           </button>
