@@ -1,15 +1,15 @@
-resource "aws_cloudfront_origin_access_identity" "origin_identity" {
-  comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
-}
+# resource "aws_cloudfront_origin_access_identity" "origin_identity" {
+#   comment = "OAI for mine-bitcoin-online-frontend-${var.environment}"
+# }
 
-#new
-resource "aws_cloudfront_origin_access_control" "frontend_oac" {
-  name                              = "frontend-oac-${var.environment}"
-  description                       = "OAC for mine-bitcoin-online-frontend-${var.environment}"
-  signing_behavior                  = "always"
-  signing_protocol                  = "sigv4"
-  origin_access_control_origin_type = "s3"
-}
+# #new
+# resource "aws_cloudfront_origin_access_control" "frontend_oac" {
+#   name                              = "frontend-oac-${var.environment}"
+#   description                       = "OAC for mine-bitcoin-online-frontend-${var.environment}"
+#   signing_behavior                  = "always"
+#   signing_protocol                  = "sigv4"
+#   origin_access_control_origin_type = "s3"
+# }
 
 # https://github.com/tenable/terrascan/blob/master/docs/policies/aws.md
 
@@ -18,7 +18,7 @@ resource "aws_cloudfront_origin_access_control" "frontend_oac" {
 #ts:skip=AC_AWS_0025 Ensure logging is enabled (cost issue)
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
-    domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
+    domain_name = "${aws_s3_bucket.frontend_bucket.bucket}.s3-website-${data.aws_region.current.name}.amazonaws.com"
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
     # s3_origin_config {
