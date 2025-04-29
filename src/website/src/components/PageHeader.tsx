@@ -18,15 +18,15 @@ const navLinks: NavLinkProps[] = [
 ];
 
 function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) {
-  let visibility = "";
-  if (show === "md") visibility = "hidden md:inline";
-  else if (show === "lg") visibility = "hidden lg:inline";
-  else visibility = "inline";
+  let visibilityClass = "";
+  if (show === "md") visibilityClass = "hidden md:inline-block";
+  else if (show === "lg") visibilityClass = "hidden lg:inline-block";
+  else visibilityClass = "inline-block";
 
   return (
     <Link
       href={href}
-      className={`${visibility} text-white font-medium hover:text-[#f7931a] inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out ${className}`}
+      className={`${visibilityClass} text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out ${className}`}
       {...props}
     >
       {label}
