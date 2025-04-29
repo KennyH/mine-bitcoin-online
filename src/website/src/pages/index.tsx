@@ -9,7 +9,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-[#00eaff] text-2xl font-semibold">Loading...</div>
+        <div className="text-[#f7931a] text-2xl font-semibold">Loading...</div>
       </div>
     );
   }
@@ -17,16 +17,16 @@ export default function Home() {
   return (
     <>
       <nav className="w-full flex justify-center gap-8 py-6 bg-transparent text-lg font-medium border-b border-[#23233a]">
-        <a href="#about" className="hover:text-[#00eaff] transition-colors">About</a>
-        <a href="#how-it-works" className="hover:text-[#00eaff] transition-colors">How It Works</a>
-        <a href="#contact" className="hover:text-[#00eaff] transition-colors">Contact</a>
+        <a href="#about" className="hover:text-[#f7931a] transition-colors">About</a>
+        <a href="#how-it-works" className="hover:text-[#f7931a] transition-colors">How It Works</a>
+        <a href="#contact" className="hover:text-[#f7931a] transition-colors">Contact</a>
       </nav>
 
       <main className="flex-1 w-full">
         {/* ABOUT SECTION */}
         <section id="about" className="w-full py-16 px-4 border-b border-[#23233a]">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+            <h2 className="text-2xl font-bold text-[#f7931a] mb-4 border-b-2 border-[#f7931a] inline-block">
               About the Project
             </h2>
             <p className="mt-2 text-lg">
@@ -38,7 +38,7 @@ export default function Home() {
         {/* HOW IT WORKS SECTION */}
         <section id="how-it-works" className="w-full py-16 px-4 border-b border-[#23233a]">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+            <h2 className="text-2xl font-bold text-[#f7931a] mb-4 border-b-2 border-[#f7931a] inline-block">
               How It Works
             </h2>
             <ul className="list-disc list-inside space-y-2 text-lg">
@@ -53,7 +53,7 @@ export default function Home() {
         {/* CONTACT SECTION */}
         <section id="contact" className="w-full py-16 px-4">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-[#00eaff] mb-4 border-b-2 border-[#00eaff] inline-block">
+            <h2 className="text-2xl font-bold text-[#f7931a] mb-4 border-b-2 border-[#f7931a] inline-block">
               Contact
             </h2>
             <p className="text-lg">
