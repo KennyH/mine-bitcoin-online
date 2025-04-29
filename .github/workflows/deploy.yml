@@ -98,7 +98,11 @@ jobs:
           NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
-        run: npm run build
+          NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
+          NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          npm run build
+          npm run postbuild
 
       - name: Adding extended robots.txt for dev environment
         if: ${{ inputs.environment == 'dev' }}
