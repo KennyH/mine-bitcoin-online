@@ -35,16 +35,16 @@ function handler(event) {
     }
 
     // when no slash, redirect to slash-version
-    if (!uri.endsWith('/')) {
-        var response = {
-            statusCode: 301,
-            statusDescription: 'Moved Permanently',
-            headers: {
-                "location": { "value": uri + "/" }
-            }
-        };
-        return response;
-    }
+    //if (!uri.endsWith('/')) {
+    //    var response = {
+    //        statusCode: 301,
+    //        statusDescription: 'Moved Permanently',
+    //        headers: {
+    //            "location": { "value": uri + "/" }
+    //        }
+    //    };
+    //    return response;
+    //}
 
     request.uri = uri + 'index.html';
     return request;
