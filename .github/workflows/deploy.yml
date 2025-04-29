@@ -102,33 +102,9 @@ jobs:
           NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
         run: |
           npm run build
-          npm run postbuild
-
-      - name: Adding extended robots.txt for dev environment
-        if: ${{ inputs.environment == 'dev' }}
-        run: |
-          cat << EOF > src/website/out/robots.txt
-          User-agent: *
-          Disallow: /
-
-          User-agent: GPTBot
-          Disallow: /
-
-          User-agent: ChatGPT-User
-          Disallow: /
-
-          User-agent: Googlebot
-          Disallow: /
-
-          User-agent: Bingbot
-          Disallow: /
-
-          User-agent: anthropic-ai
-          Disallow: /
-
-          User-agent: ClaudeBot
-          Disallow: /
-          EOF
+          if [ "${{ inputs.environment }}" = "prod" ]; then
+            npm run postbuild
+          fi
 
       - name: Deploy to S3 bucket
         run: |
