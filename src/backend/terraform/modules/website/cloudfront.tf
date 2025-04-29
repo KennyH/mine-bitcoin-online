@@ -18,7 +18,7 @@
 #ts:skip=AC_AWS_0025 Ensure logging is enabled (cost issue)
 resource "aws_cloudfront_distribution" "frontend_distribution" {
   origin {
-    domain_name = "${aws_s3_bucket.frontend_bucket.bucket}.s3-website-${data.aws_region.current.name}.amazonaws.com"
+    domain_name = "${aws_s3_bucket.frontend_bucket.bucket}.s3-website-${var.aws_region}.amazonaws.com"
     origin_id   = aws_s3_bucket.frontend_bucket.id
 
     # s3_origin_config {
