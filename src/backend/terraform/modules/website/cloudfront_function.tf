@@ -46,7 +46,9 @@ function handler(event) {
     //    return response;
     //}
 
-    request.uri = uri + 'index.html';
+    if (uri.endsWith('/')) {
+        request.uri = uri + "index.html";
+    }
     return request;
 }
 EOT
