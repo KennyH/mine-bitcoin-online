@@ -67,7 +67,9 @@ export default function PageHeader() {
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <Link
               href="/start"
-              className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-2 py-2 rounded shadow hover:scale-105 transition-transform"
+              //TESTING ON MOBILE
+              // className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-2 py-2 rounded shadow hover:scale-105 transition-transform"
+              className="z-10 bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-6 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
             >
               Start Mining
             </Link>
@@ -83,7 +85,9 @@ export default function PageHeader() {
             {/* Start Mining reduced to Start (on <md) */}
             <Link
               href="/start"
-              className="md:hidden bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-1 py-2 rounded shadow hover:scale-105 transition-transform"
+              //TESTING ON MOBILE
+              // className="md:hidden bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-1 py-2 rounded shadow hover:scale-105 transition-transform"
+              className="md:hidden z-10 bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
             >
               Start
             </Link>

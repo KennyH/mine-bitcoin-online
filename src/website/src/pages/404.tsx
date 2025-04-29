@@ -13,7 +13,7 @@ export default function Custom404() {
       <main className="flex flex-col min-h-[calc(100vh-200px)] items-center justify-center bg-[#0a0c10] text-[#e0e6ed] font-sans px-4 pt-12">
         <div className="w-full max-w-2xl flex flex-col items-center space-y-6">
           <div className={`transition-opacity duration-1000 ${loaded ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="transform transition-transform hover:scale-105">
+          <div className="transform transition-transform duration-500 ease-in-out hover:scale-105">
               <Image
                 src="/images/droids.png"
                 alt="Two lost robots in a desert with a Bitcoin theme"
@@ -33,7 +33,7 @@ export default function Custom404() {
           </p>
           <button
             onClick={() => router.back()}
-            className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-6 py-3 rounded shadow hover:scale-105 transition-transform"
+            className="bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-6 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-transform duration-300 ease-in-out"
           >
             Go Back
           </button>
