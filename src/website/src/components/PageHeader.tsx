@@ -59,7 +59,7 @@ export default function PageHeader() {
             </span>
             {/* Mobile Title */}
             <span className="truncate font-bold text-white group-hover:text-[#00eaff] transition-colors text-base sm:text-lg md:text-xl inline md:hidden">
-              BTC Browser Miner
+              BTC Miner
             </span>
           </Link>
 
