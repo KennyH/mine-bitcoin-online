@@ -37,3 +37,22 @@ resource "aws_lambda_function" "cognito_custom_auth_lambda" {
     }
   }
 }
+
+resource "aws_iam_role_policy" "lambda_ses_send" {
+  name = "lambda-ses-send"
+  role = aws_iam_role.cognito_custom_auth_lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ses:SendEmail",
+          "ses:SendRawEmail"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}

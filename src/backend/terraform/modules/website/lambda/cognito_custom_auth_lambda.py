@@ -1,5 +1,10 @@
 #import json
 import secrets
+import boto3
+import os
+
+ses = boto3.client("ses", region_name="us-west-2")
+FROM_EMAIL = "noreply@bitcoinbrowserminer.com"
 
 def lambda_handler(event, context):
     trigger_source = event.get("triggerSource")
@@ -74,10 +79,22 @@ def handle_create_auth_challenge(event, context):
             "answer": challenge_code
         }
 
-        # Just log it. In production, use the "CustomMessage" trigger
-        # or another means to actually send the code, if not using Cognito's "EMAIL_OTP".
         print(f"Sending OTP code {challenge_code} to {event['request']['userAttributes']['email']}")
+        send_otp_email(challenge_code, event['request']['userAttributes']['email'])
     return event
+
+
+def send_otp_email(to_email, code):
+    subject = "Your Bitcoin Browser Miner Login Code"
+    body = f"Your verification code is: {code}\n\nUse this code to log in.\nIf you did not request this code, please ignore this email."
+    ses.send_email(
+        Source=FROM_EMAIL,
+        Destination={"ToAddresses": [to_email]},
+        Message={
+            "Subject": {"Data": subject},
+            "Body": {"Text": {"Data": body}},
+        },
+    )
 
 
 def handle_verify_auth_challenge(event, context):

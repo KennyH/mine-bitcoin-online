@@ -39,13 +39,19 @@ resource "aws_cognito_user_pool" "user_pool" {
 
   deletion_protection = var.environment == "prod" ? "ACTIVE" : "INACTIVE"
 
-  email_configuration {
-    email_sending_account = "COGNITO_DEFAULT"
+  sign_in_policy {
+    allowed_first_auth_factors = ["CUSTOM_AUTH"]
   }
 
-  # have to include password, even though it should never be used..
-  sign_in_policy {
-    allowed_first_auth_factors = ["EMAIL_OTP", "PASSWORD"]
+  lambda_config {
+    pre_sign_up                    = aws_lambda_function.cognito_custom_auth_lambda.arn
+    define_auth_challenge          = aws_lambda_function.cognito_custom_auth_lambda.arn
+    create_auth_challenge          = aws_lambda_function.cognito_custom_auth_lambda.arn
+    verify_auth_challenge_response = aws_lambda_function.cognito_custom_auth_lambda.arn
+  }
+
+  email_configuration {
+    email_sending_account = "COGNITO_DEFAULT"
   }
 
   device_configuration {
