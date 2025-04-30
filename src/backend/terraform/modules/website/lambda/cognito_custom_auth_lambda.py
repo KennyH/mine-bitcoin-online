@@ -1,14 +1,17 @@
 import secrets
 import boto3
-import os
+import logging
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 ses = boto3.client("ses", region_name="us-west-2")
 FROM_EMAIL = "noreply@bitcoinbrowserminer.com"
 
 def lambda_handler(event, context):
-    print("Lambda triggered. Event:", event)
+    logger.info("Lambda triggered. Event: %s", event)
     trigger_source = event.get("triggerSource")
-    print(f"Trigger source: {trigger_source}")
+    logger.info("Trigger source: %s", trigger_source)
     trigger_handlers = {
         "PreSignUp_SignUp": handle_pre_sign_up,
         "DefineAuthChallenge_Authentication": handle_define_auth_challenge,
@@ -18,33 +21,34 @@ def lambda_handler(event, context):
 
     handler_function = trigger_handlers.get(trigger_source)
     if not handler_function:
-        print("No handler for trigger source:", trigger_source)
+        logger.warning("No handler for trigger source: %s", trigger_source)
         return event
 
     return handler_function(event, context)
 
 def handle_pre_sign_up(event, context):
-    print("PreSignUp: Auto-confirming and auto-verifying user.")
+    logger.info("PreSignUp: Auto-confirming and auto-verifying user.")
     event["response"]["autoConfirmUser"] = True
     event["response"]["autoVerifyEmail"] = True
     return event
 
 def handle_define_auth_challenge(event, context):
-    print("DefineAuthChallenge: Session:", event["request"]["session"])
     session = event["request"]["session"]
+    logger.info("DefineAuthChallenge: Session: %s", session)
 
     if len(session) == 0:
-        print("No session, issuing CUSTOM_CHALLENGE.")
+        logger.info("No session, issuing CUSTOM_CHALLENGE.")
         event["response"]["challengeName"] = "CUSTOM_CHALLENGE"
         event["response"]["issueTokens"] = False
         event["response"]["failAuthentication"] = False
     else:
-        if session[-1]["challengeName"] == "CUSTOM_CHALLENGE" and session[-1]["challengeResult"]:
-            print("Previous challenge succeeded, issuing tokens.")
+        last = session[-1]
+        if last["challengeName"] == "CUSTOM_CHALLENGE" and last["challengeResult"]:
+            logger.info("Previous challenge succeeded, issuing tokens.")
             event["response"]["issueTokens"] = True
             event["response"]["failAuthentication"] = False
         else:
-            print("Previous challenge failed or not present, issuing another CUSTOM_CHALLENGE.")
+            logger.info("Previous challenge failed or not present, issuing another CUSTOM_CHALLENGE.")
             event["response"]["challengeName"] = "CUSTOM_CHALLENGE"
             event["response"]["issueTokens"] = False
             event["response"]["failAuthentication"] = False
@@ -52,12 +56,12 @@ def handle_define_auth_challenge(event, context):
     return event
 
 def handle_create_auth_challenge(event, context):
-    print("CreateAuthChallenge: Event:", event)
+    logger.info("CreateAuthChallenge triggered.")
     if event["request"]["challengeName"] == "CUSTOM_CHALLENGE":
         challenge_code = str(secrets.randbelow(10**6)).zfill(6)
         user_attributes = event["request"].get("userAttributes", {})
         email = user_attributes.get("email")
-        print(f"Generated OTP code: {challenge_code} for email: {email}")
+        logger.info("Generated OTP code %s for email %s", challenge_code, email)
 
         event["response"]["publicChallengeParameters"] = {
             "email": email
@@ -68,13 +72,13 @@ def handle_create_auth_challenge(event, context):
 
         if email:
             try:
-                print(f"Attempting to send OTP code {challenge_code} to {email}")
+                logger.info("Attempting to send OTP code to %s", email)
                 send_otp_email(challenge_code, email)
-                print("Email sent successfully.")
+                logger.info("Email sent successfully.")
             except Exception as e:
-                print(f"Error sending email: {e}")
+                logger.error("Error sending email: %s", e)
         else:
-            print("No email found in userAttributes; cannot send OTP.")
+            logger.warning("No email found in userAttributes; cannot send OTP.")
     return event
 
 def send_otp_email(code, to_email):
@@ -88,11 +92,11 @@ def send_otp_email(code, to_email):
             "Body": {"Text": {"Data": body}},
         },
     )
-    print("SES send_email response:", response)
+    logger.debug("SES send_email response: %s", response)
 
 def handle_verify_auth_challenge(event, context):
     expected_answer = event["request"]["privateChallengeParameters"].get("answer")
     user_answer = event["request"]["challengeAnswer"]
-    print(f"Verifying challenge: expected {expected_answer}, got {user_answer}")
+    logger.info("Verifying challenge: expected %s, got %s", expected_answer, user_answer)
     event["response"]["answerCorrect"] = user_answer == expected_answer
     return event
