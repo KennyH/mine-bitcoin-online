@@ -7,14 +7,13 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 
 const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
-const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!;
 
 const client = new CognitoIdentityProviderClient({ region: REGION });
 
 type User = {
   email: string;
   name?: string;
-  [key: string]: any;
+  [key: string]: string | undefined;
 };
   
 type CognitoUserContextType = {
@@ -24,6 +23,12 @@ type CognitoUserContextType = {
   logout: () => void;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
 };
+
+type CognitoTokens = {
+    idToken: string;
+    accessToken: string;
+    refreshToken: string;
+  };
 
 const CognitoUserContext = createContext<CognitoUserContextType | undefined>(undefined);
 
@@ -46,7 +51,7 @@ export const CognitoUserProvider = ({ children }: { children: React.ReactNode })
     }
   };
   
-  const saveTokens = (tokens: any) => {
+  const saveTokens = (tokens: CognitoTokens) => {
     localStorage.setItem("cognito_tokens", JSON.stringify(tokens));
   };
   
@@ -68,6 +73,7 @@ export const CognitoUserProvider = ({ children }: { children: React.ReactNode })
         ...attrs,
       });
     } catch (err) {
+      console.log(err);
       setUser(null);
       clearTokens();
     }

@@ -3,7 +3,6 @@
 import { useCognitoUser } from '@/context/CognitoUserContext';
 
 export default function Home() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { loading } = useCognitoUser();
   if (loading) {
     return (
