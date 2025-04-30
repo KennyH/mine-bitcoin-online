@@ -139,9 +139,11 @@ export function useCognitoCustomAuth() {
 }
 
 function isErrorWithName(e: unknown): e is { name: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return typeof e === "object" && e !== null && "name" in e && typeof (e as any).name === "string";
 }
 
 function isErrorWithMessage(e: unknown): e is { message: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return typeof e === "object" && e !== null && "message" in e && typeof (e as any).message === "string";
 }
