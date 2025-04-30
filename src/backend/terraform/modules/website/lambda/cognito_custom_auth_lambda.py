@@ -28,8 +28,13 @@ def lambda_handler(event, context):
 
     return handler_function(event, context)
 
+
 def handle_pre_sign_up(event, context):
     logger.info("PreSignUp: Auto-confirming and auto-verifying user.")
+    tos_accepted = event["request"]["userAttributes"].get("custom:tos_accepted")
+    if tos_accepted != "true":
+        logger.warning("User did not accept ToS. Rejecting sign-up.")
+        raise Exception("You must accept the Terms of Service to sign up.")
     event["response"]["autoConfirmUser"] = True
     event["response"]["autoVerifyEmail"] = True
     return event
@@ -57,6 +62,7 @@ def handle_define_auth_challenge(event, context):
 
     return event
 
+
 def handle_create_auth_challenge(event, context):
     logger.info("CreateAuthChallenge triggered.")
     if event["request"]["challengeName"] == "CUSTOM_CHALLENGE":
@@ -82,6 +88,7 @@ def handle_create_auth_challenge(event, context):
         else:
             logger.warning("No email found in userAttributes; cannot send OTP.")
     return event
+
 
 #TODO: Make a static assets location like https://assets.bitcoinbrowserminer.com/logo.png
 def send_otp_email(code, to_email):
@@ -114,9 +121,11 @@ def send_otp_email(code, to_email):
     )
     logger.debug("SES send_email response: %s", response)
 
+
 def handle_verify_auth_challenge(event, context):
     expected_answer = event["request"]["privateChallengeParameters"].get("answer")
     user_answer = event["request"]["challengeAnswer"]
     logger.info("Verifying challenge: expected %s, got %s", expected_answer, user_answer)
     event["response"]["answerCorrect"] = user_answer == expected_answer
     return event
+
