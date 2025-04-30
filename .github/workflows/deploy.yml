@@ -51,7 +51,7 @@ jobs:
 
       - name: Terraform Import
         working-directory: src/backend/terraform/${{ inputs.environment }}
-        run: terraform import 'aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
+        run: terraform import 'module.website.aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
 
       - name: Terraform Plan
         working-directory: src/backend/terraform/${{ inputs.environment }}
