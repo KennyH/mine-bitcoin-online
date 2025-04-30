@@ -1,9 +1,11 @@
 import secrets
 import boto3
 import logging
+import os
 
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
 
 ses = boto3.client("ses", region_name="us-west-2")
 FROM_EMAIL = "noreply@bitcoinbrowserminer.com"
@@ -84,9 +86,7 @@ def handle_create_auth_challenge(event, context):
 #TODO: Make a static assets location like https://assets.bitcoinbrowserminer.com/logo.png
 def send_otp_email(code, to_email):
     subject = "Your Bitcoin Browser Miner Login Code"
-    # Plaintext fallback
     body_text = f"Your verification code is: {code}\n\nUse this code to log in.\nIf you did not request this code, please ignore this email."
-    # Html
     body_html = f"""<html>
   <head></head>
   <body style="font-family: sans-serif; line-height: 1.6; color: #1a1a1a;">
@@ -107,7 +107,7 @@ def send_otp_email(code, to_email):
         Message={
             "Subject": {"Data": subject},
             "Body": {
-                "Text": {"Data": body_text},
+                "Text": {"Data": body_text}, # Plaintext fallback
                 "Html": {"Data": body_html},
             },
         },

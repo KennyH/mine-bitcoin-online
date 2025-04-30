@@ -35,6 +35,7 @@ resource "aws_lambda_function" "cognito_custom_auth_lambda" {
   environment {
     variables = {
       ENVIRONMENT = var.environment
+      LOG_LEVEL = var.environment == "prod" ? "ERROR" : "INFO"
     }
   }
 }
