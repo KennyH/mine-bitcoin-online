@@ -86,7 +86,7 @@ def handle_create_auth_challenge(event, context):
 #TODO: Make a static assets location like https://assets.bitcoinbrowserminer.com/logo.png
 def send_otp_email(code, to_email):
     subject = "Your Bitcoin Browser Miner Login Code"
-    body_text = f"Your verification code is: {code}\n\nUse this code to log in.\nIf you did not request this code, please ignore this email."
+    body_text = f"Your verification code is: {code}\n\nUse this code to log in. It is valid for 3 minutes.\nIf you did not request this code, please ignore this email."
     body_html = f"""<html>
   <head></head>
   <body style="font-family: sans-serif; line-height: 1.6; color: #1a1a1a;">
@@ -96,7 +96,7 @@ def send_otp_email(code, to_email):
     </div>
     <p><strong>Your verification code is:</strong> 
        <code style="font-size: 1.5em; background: #f2f2f2; padding: 4px 8px; border-radius: 4px;">{code}</code></p>
-    <p>Use this code to log in.</p>
+    <p>Use this code to log in. It is valid for 3 minutes.</p>
     <p style="color: gray;">If you did not request this code, you can safely ignore this email.</p>
   </body>
 </html>"""
