@@ -1,11 +1,10 @@
 'use client';
 
-import { useAuth } from '@/context/AmplifyAuthContext';
+import { useCognitoUser } from '@/context/CognitoUserContext';
 
 export default function Home() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { user, email, loading, login, logout } = useAuth();
-
+  const { loading } = useCognitoUser();
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

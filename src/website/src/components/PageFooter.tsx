@@ -1,6 +1,8 @@
-import { FaGithub } from "react-icons/fa";
-import Link from "next/link";
-import { MdCheckCircle, MdLock } from "react-icons/md";
+'use client';
+
+import { FaGithub } from 'react-icons/fa';
+import Link from 'next/link';
+import { MdCheckCircle, MdLock } from 'react-icons/md';
 
 export default function PageFooter() {
   return (

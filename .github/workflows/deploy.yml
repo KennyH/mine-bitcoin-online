@@ -103,6 +103,7 @@ jobs:
           NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_AWS_REGION: ${{ secrets[format('{0}_NEXT_PUBLIC_AWS_REGION', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
           NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
         run: |

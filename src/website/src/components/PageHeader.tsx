@@ -1,8 +1,12 @@
-import { useState } from "react";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { FaSearch, FaBars, FaTimes } from "react-icons/fa";
+'use client';
+
+import { useState } from 'react';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { FaSearch, FaBars, FaTimes } from 'react-icons/fa';
+import SignUpModal from './SignUpModal';
+import { useCognitoUser } from '@/context/CognitoUserContext';
 
 type NavLinkProps = {
   href: string;
@@ -12,7 +16,6 @@ type NavLinkProps = {
 };
 
 const navLinks: NavLinkProps[] = [
-  { href: "/get-started", label: "Get Started", show: "md" },
   { href: "/docs/learn", label: "Learn", show: "lg" },
   { href: "/docs/faq", label: "FAQ", show: "lg" },
 ];
@@ -36,6 +39,13 @@ function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) 
 
 export default function PageHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showSignUp, setShowSignUp] = useState(false);
+  const { user, loading, logout } = useCognitoUser();
+
+  const handleLogout = (e: React.MouseEvent) => {
+    e.preventDefault();
+    logout();
+  };
 
   return (
     <>
@@ -63,30 +73,57 @@ export default function PageHeader() {
             </span>
           </Link>
 
-          {/* Center: Start Mining Button (md+) */}
+          {/* Center: Show only one button based on login state (md+) */}
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Link
-              href="/start"
-              className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
-            >
-              Start Mining
-            </Link>
+            {!loading && user ? (
+              <Link
+                href="/start"
+                className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              >
+                Start Mining
+              </Link>
+            ) : !loading ? (
+              <button
+                onClick={() => setShowSignUp(true)}
+                className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              >
+                Get Started
+              </button>
+            ) : null}
           </div>
 
-          {/* Right: Nav links, Start Mining (on <md), search, hamburger */}
+          {/* Right: Nav links, Start/Logout (on <md), search, hamburger */}
           <nav className="flex items-center gap-5 z-20">
-            {/* Map over navLinks */}
             {navLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
 
-            {/* Start Mining reduced to Start (on <md) */}
-            <Link
-              href="/start"
-              className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
-            >
-              Start
-            </Link>
+            {/* Show Start or Get Started on mobile */}
+            {!loading && user ? (
+              <Link
+                href="/start"
+                className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              >
+                Start
+              </Link>
+            ) : !loading ? (
+              <button
+                className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+                onClick={() => setShowSignUp(true)}
+              >
+                Get Started
+              </button>
+            ) : null}
+
+            {/* Show Log out only if logged in */}
+            {!loading && user && (
+              <button
+                onClick={handleLogout}
+                className="noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out"
+              >
+                Log out
+              </button>
+            )}
 
             {/* Search always visible */}
             <Link
@@ -107,6 +144,8 @@ export default function PageHeader() {
             </button>
           </nav>
 
+          <SignUpModal open={showSignUp} onClose={() => setShowSignUp(false)} />
+
           {/* Hamburger menu overlay */}
           {menuOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-80 z-40 flex flex-col items-center justify-center">
@@ -117,7 +156,7 @@ export default function PageHeader() {
               >
                 <FaTimes className="text-white text-2xl" />
               </button>
-              {/* Show all links in mobile menu */}
+              {/* Show nav links in mobile menu */}
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -128,6 +167,37 @@ export default function PageHeader() {
                   {link.label}
                 </Link>
               ))}
+              {/* Show Start/Logout or Get Started in mobile menu */}
+              {!loading && user ? (
+                <>
+                  <Link
+                    href="/start"
+                    className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Start Mining
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      setMenuOpen(false);
+                      handleLogout(e);
+                    }}
+                    className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : !loading ? (
+                <button
+                  className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setShowSignUp(true);
+                  }}
+                >
+                  Get Started
+                </button>
+              ) : null}
             </div>
           )}
         </div>

@@ -1,3 +1,5 @@
+'use client';
+
 import { ReactNode } from "react";
 import PageHeader from './PageHeader';
 import PageBanner from './PageBanner';

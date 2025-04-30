@@ -20,7 +20,7 @@ export default function Custom404() {
                 className="rounded-lg shadow-lg"
                 width={800}
                 height={533}
-                onLoadingComplete={() => setLoaded(true)}
+                onLoad={() => setLoaded(true)}
                 priority
               />
             </div>
