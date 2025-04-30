@@ -49,9 +49,10 @@ jobs:
       #   working-directory: src/backend/terraform/${{ inputs.environment }}
       #   run: terraform destroy -auto-approve -target=module.btcminer_backend.aws_cognito_user_pool.user_pool
 
-      - name: Terraform Import
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        run: terraform import 'module.website.aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
+      # # TEMPORARY: used for addinf stuff to state
+      # - name: Terraform Import
+      #   working-directory: src/backend/terraform/${{ inputs.environment }}
+      #   run: terraform import 'module.website.aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
 
       - name: Terraform Plan
         working-directory: src/backend/terraform/${{ inputs.environment }}
