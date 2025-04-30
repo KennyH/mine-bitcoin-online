@@ -62,6 +62,16 @@ resource "aws_cognito_user_pool" "user_pool" {
     }
   }
 
+  # using a fake random number password, so need a minimum policy
+  password_policy {
+    minimum_length    = 6
+    require_uppercase = false
+    require_lowercase = false
+    require_numbers   = false
+    require_symbols   = false
+    temporary_password_validity_days = 1
+  }
+
   verification_message_template {
     default_email_option = "CONFIRM_WITH_CODE"
 
