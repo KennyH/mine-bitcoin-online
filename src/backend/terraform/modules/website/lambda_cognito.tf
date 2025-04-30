@@ -56,3 +56,11 @@ resource "aws_iam_role_policy" "lambda_ses_send" {
     ]
   })
 }
+
+resource "aws_lambda_permission" "cognito_custom_auth_lambda" {
+  statement_id  = "AllowExecutionFromCognito"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cognito_custom_auth_lambda.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.user_pool.arn
+}
