@@ -346,7 +346,7 @@ function Sha256Canvas() {
 
 export default function Sha256Page(){
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+    <div className="flex flex-col items-center min-h-[60vh]">
       <h1 className="text-2xl font-bold mb-2">SHA-256 Visualizer</h1>
       <Sha256Canvas />
     </div>
