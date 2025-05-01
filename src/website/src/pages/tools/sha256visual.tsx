@@ -163,6 +163,7 @@ function Sha256Canvas() {
 
   const autoSlideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoSlideIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const messageInputId = useId();
 
   // --- Drawing parameters ---
   // These define the internal resolution/detail
@@ -265,8 +266,6 @@ function Sha256Canvas() {
     setFrameIdx(+e.target.value);
   };
   // --- End Effects and handlers ---
-
-  const messageInputId = "messageToHashId"
 
   return (
     <div className="w-full max-w-full">
