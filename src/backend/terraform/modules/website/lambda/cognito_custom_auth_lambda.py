@@ -93,7 +93,14 @@ def handle_create_auth_challenge(event, context):
 #TODO: Make a static assets location like https://assets.bitcoinbrowserminer.com/logo.png
 def send_otp_email(code, to_email):
     subject = "Your Bitcoin Browser Miner Login Code"
-    body_text = f"Your verification code is: {code}\n\nUse this code to log in. It is valid for 3 minutes.\nIf you did not request this code, please ignore this email."
+    ios_otp_line = f"{code} is your Bitcoin Browser Miner code."
+
+    body_text = (
+        f"{ios_otp_line}\n\n"
+        "Use this code to log in. It is valid for 3 minutes.\n"
+        "If you did not request this code, please ignore this email."
+    )
+
     body_html = f"""<html>
   <head></head>
   <body style="font-family: sans-serif; line-height: 1.6; color: #1a1a1a;">
@@ -101,20 +108,19 @@ def send_otp_email(code, to_email):
       <img src="https://dev-env.bitcoinbrowserminer.com/images/bitcoin.png" alt="Bitcoin Browser Miner Logo" width="64" style="margin-bottom: 16px;" />
       <h2>Your Bitcoin Browser Miner Login Code</h2>
     </div>
-    <p><strong>Your verification code is:</strong> 
-       <code style="font-size: 1.5em; background: #f2f2f2; padding: 4px 8px; border-radius: 4px;">{code}</code></p>
+    <p style="font-size:1.2em; font-weight:bold; letter-spacing:2px;">{ios_otp_line}</p>
     <p>Use this code to log in. It is valid for 3 minutes.</p>
     <p style="color: gray;">If you did not request this code, you can safely ignore this email.</p>
   </body>
 </html>"""
-    
+
     response = ses.send_email(
         Source=FROM_EMAIL,
         Destination={"ToAddresses": [to_email]},
         Message={
             "Subject": {"Data": subject},
             "Body": {
-                "Text": {"Data": body_text}, # Plaintext fallback
+                "Text": {"Data": body_text},
                 "Html": {"Data": body_html},
             },
         },
