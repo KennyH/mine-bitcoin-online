@@ -90,6 +90,8 @@ export default function SignUpModal({
               className={`flex-1 py-2 font-semibold rounded-t ${tab === "signIn" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
               onClick={() => handleTab("signIn")}
               type="button"
+              name="signin-tab"
+              id="signin-tab"
             >
               Sign In
             </button>
@@ -97,6 +99,8 @@ export default function SignUpModal({
               className={`flex-1 py-2 font-semibold rounded-t ${tab === "signUp" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
               onClick={() => handleTab("signUp")}
               type="button"
+              name="signup-tab"
+              id="signup-tab"
             >
               Sign Up
             </button>
@@ -105,6 +109,9 @@ export default function SignUpModal({
             <form onSubmit={handleSignUp} className="flex flex-col gap-4">
               <input
                 type="text"
+                name="name"
+                id="signup-name"
+                autoComplete="name"
                 placeholder="Name"
                 className="p-2 rounded bg-[#23233a] text-white"
                 value={name}
@@ -113,6 +120,9 @@ export default function SignUpModal({
               />
               <input
                 type="email"
+                name="email"
+                id="signup-email"
+                autoComplete="email"
                 placeholder="Email"
                 className="p-2 rounded bg-[#23233a] text-white"
                 value={email}
@@ -122,6 +132,8 @@ export default function SignUpModal({
               <label className="flex items-center gap-2">
               <input
                 type="checkbox"
+                name="tos-checkbox"
+                id="signup-tos-checkbox"
                 checked={tosAccepted}
                 onChange={e => setTosAccepted(e.target.checked)}
                 required
@@ -132,6 +144,8 @@ export default function SignUpModal({
             </label>
               <button
                 type="submit"
+                name="continue-submit"
+                id="signup-continue-submit"
                 className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
                 disabled={loading || !tosAccepted}
               >
@@ -143,6 +157,9 @@ export default function SignUpModal({
             <form onSubmit={handleSignIn} className="flex flex-col gap-4">
               <input
                 type="email"
+                name="email"
+                id="signin-email"
+                autoComplete="email"
                 placeholder="Email"
                 className="p-2 rounded bg-[#23233a] text-white"
                 value={email}
@@ -151,6 +168,8 @@ export default function SignUpModal({
               />
               <button
                 type="submit"
+                name="continue-submit"
+                id="signip-continue-submit"
                 className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
                 disabled={loading}
               >
@@ -166,6 +185,9 @@ export default function SignUpModal({
           <h2 className="text-xl font-bold mb-2">Enter the code sent to your email</h2>
           <input
             type="text"
+            name="otp"
+            id="otp-code"
+            autoComplete="one-time-code"
             placeholder="6-digit code"
             className="p-2 rounded bg-[#23233a] text-white"
             value={otp}
@@ -175,6 +197,8 @@ export default function SignUpModal({
           />
           <button
             type="submit"
+            name="otp-submit"
+            id="otp-continue-submit"
             className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
             disabled={loading}
           >
