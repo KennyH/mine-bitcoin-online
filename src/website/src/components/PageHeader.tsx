@@ -18,6 +18,7 @@ type NavLinkProps = {
 const navLinks: NavLinkProps[] = [
   { href: "/docs/learn", label: "Learn", show: "lg" },
   { href: "/docs/faq", label: "FAQ", show: "lg" },
+  { href: "/search", label: "Search", show: "md" },
 ];
 
 function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) {
@@ -108,27 +109,27 @@ export default function PageHeader() {
               </Link>
             ) : !loading ? (
               <button
-                className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+                className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-2 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
                 onClick={() => setShowSignUp(true)}
               >
                 Get Started
               </button>
             ) : null}
 
-            {/* Show Log out only if logged in */}
+            {/* Show Log out button on header only if logged in and not on mobile */}
             {!loading && user && (
               <button
                 onClick={handleLogout}
-                className="noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out"
+                className="md:hidden noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out"
               >
                 Log out
               </button>
             )}
 
-            {/* Search always visible */}
+            {/* Search not visible on mobile */}
             <Link
               href="/search"
-              className="noselect p-2 rounded hover:bg-[#23233a] inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+              className="hidden md:inline-block noselect p-2 rounded hover:bg-[#23233a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
               aria-label="Search"
             >
               <FaSearch className="text-white text-lg" />
