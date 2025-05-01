@@ -158,152 +158,155 @@ function Sha256Canvas() {
   const [frameIdx, setFrameIdx] = useState(0);
   const [frames, setFrames] = useState<Frame[]>([]);
   const [digest, setDigest] = useState("");
-  const [isAutoPlaying, setIsAutoPlaying] = useState(false); // Track auto-play state
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false);
 
-  // Refs to store timer IDs
   const autoSlideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const autoSlideIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const cell = 4; // px per bit
-  const cols = 512; // we’ll only draw first 512 bits for now
-  // const height = 100; 
+  // --- Drawing parameters ---
+  // These define the internal resolution/detail
+  const cell = 4; // Logical size of a "bit" for drawing calculations
+  const cols = 512; // Number of "columns" (bits) to visualize from w[0]..w[15]
+  const internalCanvasWidth = cols * cell + 60; // Calculate internal width needed
+  const internalCanvasHeight = 120; // Fixed internal height
 
-  // --- Effect 1: Run SHA-256 calculation when message changes ---
+  // --- Effects and handlers (no changes needed here from previous step) ---
+  // useEffect for SHA-256 calculation [msg]
   useEffect(() => {
-    // Clear any pending/active auto-slide timers when msg changes
-    if (autoSlideTimeoutRef.current) clearTimeout(autoSlideTimeoutRef.current);
-    if (autoSlideIntervalRef.current) clearInterval(autoSlideIntervalRef.current);
-    setIsAutoPlaying(false); // Stop auto-play
-
-    // Perform the hashing
+    stopAutoSlide();
     const { frames: fr, digestHex } = sha256Trace(
-      new TextEncoder().encode(msg || ""), // Handle empty string case
+      new TextEncoder().encode(msg || ""),
     );
     setFrames(fr);
     setDigest(digestHex);
-    setFrameIdx(0); // Reset slider to the beginning
-    // Auto-sliding will be triggered by the effect below watching 'frames'
+    setFrameIdx(0);
   }, [msg]);
 
-  // --- Effect 2: Draw on canvas when frame index or frames change ---
+  // useEffect for drawing [frameIdx, frames, cell, cols]
   useEffect(() => {
-    if (!canvasRef.current || frames.length === 0 || frameIdx >= frames.length)
-      return;
+    // Use internalCanvasWidth/Height for checks and drawing logic
+    if (
+      !canvasRef.current ||
+      frames.length === 0 ||
+      frameIdx >= frames.length
+    ) return;
 
     const ctx = canvasRef.current.getContext("2d")!;
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // Clear using the canvas attribute dimensions
+    ctx.clearRect(0, 0, internalCanvasWidth, internalCanvasHeight);
     const f = frames[frameIdx];
 
-    /* draw a 512-bit row from the schedule */
+    /* draw a 512-bit row */
     for (let i = 0; i < cols; ++i) {
-      // Ensure we don't read past the 16 words usually visualized
       const wordIdx = i >> 5;
-      if (wordIdx >= f.w.length) continue; // Safety check
-
+      if (wordIdx >= f.w.length) continue;
       const word = f.w[wordIdx];
       const bit = (word >>> (31 - (i & 31))) & 1;
       ctx.fillStyle = bit ? "#00eaff" : "#033c44";
+      // Use 'cell' for drawing coordinates
       ctx.fillRect(i * cell, 0, cell, cell);
     }
 
     /* draw a–h bars */
     const regs = [f.a, f.b, f.c, f.d, f.e, f.f, f.g, f.h];
     regs.forEach((val, idx) => {
-      const y = 20 + idx * 10;
-      ctx.fillStyle = "#08909d";
-      // Ensure val is treated as unsigned 32-bit for percentage calculation
-      const percentage = (val >>> 0) / 0xffffffff;
-      ctx.fillRect(0, y, percentage * cols * cell, 6);
-      ctx.fillStyle = "#e0e6ed";
-      ctx.fillText("abcdefgh"[idx], cols * cell + 4, y + 6);
+    // Use internalCanvasHeight for positioning
+    const y = 20 + idx * 10;
+    ctx.fillStyle = "#08909d";
+    const percentage = (val >>> 0) / 0xffffffff;
+    // Use 'cols * cell' for bar width calculation relative to the bit area
+    ctx.fillRect(0, y, percentage * cols * cell, 6);
+    ctx.fillStyle = "#e0e6ed";
+    // Position text relative to 'cols * cell'
+    ctx.fillText("abcdefgh"[idx], cols * cell + 4, y + 6);
     });
-  }, [frameIdx, frames, cell, cols]); // Dependencies: redraw when these change
+  }, [frameIdx, frames, cell, cols, internalCanvasWidth, internalCanvasHeight]); // Add internal dimensions to dependencies
 
-  // --- Function to stop auto-sliding ---
+  // useCallback for stopAutoSlide
   const stopAutoSlide = useCallback(() => {
     if (autoSlideTimeoutRef.current) clearTimeout(autoSlideTimeoutRef.current);
     if (autoSlideIntervalRef.current) clearInterval(autoSlideIntervalRef.current);
     setIsAutoPlaying(false);
-  }, []); // No dependencies, safe to memoize
+  }, []);
 
-  // --- Effect 3: Handle auto-sliding ---
+  // useEffect for auto-sliding [frames, stopAutoSlide]
   useEffect(() => {
-    // Don't start if there are no frames
-    if (frames.length === 0) {
+      if (frames.length === 0) {
       stopAutoSlide();
       return;
-    }
+      }
+      stopAutoSlide(); // Clear previous timers
 
-    // Start the initial delay timer
-    autoSlideTimeoutRef.current = setTimeout(() => {
+      autoSlideTimeoutRef.current = setTimeout(() => {
       setIsAutoPlaying(true);
-      // Start the interval timer after the delay
       autoSlideIntervalRef.current = setInterval(() => {
-        setFrameIdx((prevIdx) => {
+          setFrameIdx((prevIdx) => {
           const nextIdx = prevIdx + 1;
-          // If we reached the end, stop the interval
           if (nextIdx >= frames.length) {
-            if (autoSlideIntervalRef.current)
+              if (autoSlideIntervalRef.current)
               clearInterval(autoSlideIntervalRef.current);
-            setIsAutoPlaying(false);
-            return prevIdx; // Stay at the last frame
+              setIsAutoPlaying(false);
+              return prevIdx;
           }
-          return nextIdx; // Otherwise, move to the next frame
-        });
-      }, 500); // 500ms interval
-    }, 1000); // 1000ms initial delay
+          return nextIdx;
+          });
+        }, 500);
+      }, 1000);
 
-    // Cleanup function: clear timers when component unmounts or 'frames' changes
-    return () => {
+      return () => {
       stopAutoSlide();
-    };
-  }, [frames, stopAutoSlide]); // Dependency: run when frames array changes
+      };
+  }, [frames, stopAutoSlide]);
 
-  // --- Handler for manual slider change ---
+  // handleSliderChange
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    stopAutoSlide(); // Stop auto-play on manual interaction
+    stopAutoSlide();
     setFrameIdx(+e.target.value);
   };
+  // --- End Effects and handlers ---
 
   return (
+    // Remove overflow-x-auto
     <div className="w-full max-w-full">
-      {/* Input - No button needed */}
-      <div className="flex items-center gap-2 my-4">
+    {/* Input */}
+    <div className="flex items-center gap-2 my-4">
         <input
-          value={msg}
-          onChange={(e) => setMsg(e.target.value)}
-          placeholder="Enter message to hash..."
-          className="flex-1 p-2 bg-[#122126] text-[#e0f3f7] border border-[#28444a] rounded"
+        value={msg}
+        onChange={(e) => setMsg(e.target.value)}
+        placeholder="Enter message to hash..."
+        className="flex-1 p-2 bg-[#122126] text-[#e0f3f7] border border-[#28444a] rounded"
         />
-        {/* Optional: Add a play/pause button maybe? For now, interaction stops it. */}
-      </div>
+    </div>
 
-      <canvas
+    {/* Canvas: Set display width via CSS, keep attributes for resolution */}
+    <canvas
         ref={canvasRef}
-        width={cols * cell + 60} // Add space for labels
-        height={120} // Fixed height based on original
-        className="border border-[#00eaff]/40"
-      />
+        width={internalCanvasWidth} // Internal drawing buffer width
+        height={internalCanvasHeight} // Internal drawing buffer height
+        // Style sets display size: w-full makes it fit container width
+        // max-w-full ensures it doesn't exceed container if container is smaller than internal width
+        // height: auto maintains aspect ratio based on the display width (optional)
+        className="border border-[#00eaff]/40 block w-full max-w-full h-auto"
+    />
 
-      {frames.length > 0 && (
-        <>
-          <input
+    {/* Slider and Text */}
+    {frames.length > 0 && (
+        <div className="mt-2">
+        <input
             type="range"
             min={0}
             max={frames.length - 1}
             value={frameIdx}
             onChange={handleSliderChange}
             className="w-full my-2"
-            // Optional: Disable slider during auto-play?
-            // disabled={isAutoPlaying}
-          />
-          <p className="text-sm text-gray-400">
+        />
+        <p className="text-sm text-gray-400">
             Round {frameIdx + 1}/{frames.length}
             {isAutoPlaying ? " (Auto-playing)" : ""}
             &nbsp;&nbsp;|&nbsp;&nbsp;Digest: <code>{digest}</code>
-          </p>
-        </>
-      )}
+        </p>
+        </div>
+    )}
     </div>
   );
 }
