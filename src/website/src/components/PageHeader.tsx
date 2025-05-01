@@ -149,7 +149,7 @@ export default function PageHeader() {
 
           {/* Hamburger menu overlay */}
           {menuOpen && (
-            <div className="fixed inset-0 bg-black bg-opacity-80 z-40 flex flex-col items-center justify-center">
+            <div className="fixed inset-0 bg-black bg-opacity-80 z-40 flex flex-col items-center justify-center space-y-10">
               <button
                 className="absolute top-4 right-4 p-2 rounded hover:bg-[#23233a] inline-block hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
                 aria-label="Close menu"
@@ -162,7 +162,7 @@ export default function PageHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                  className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
@@ -173,7 +173,7 @@ export default function PageHeader() {
                 <>
                   <Link
                     href="/start"
-                    className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                    className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
                     onClick={() => setMenuOpen(false)}
                   >
                     Start Mining
@@ -183,14 +183,14 @@ export default function PageHeader() {
                       setMenuOpen(false);
                       handleLogout(e);
                     }}
-                    className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                    className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
                   >
                     Log out
                   </button>
                 </>
               ) : !loading ? (
                 <button
-                  className="noselect mb-4 text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                  className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
                   onClick={() => {
                     setMenuOpen(false);
                     setShowSignUp(true);
