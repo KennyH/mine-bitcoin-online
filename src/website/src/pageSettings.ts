@@ -21,6 +21,12 @@ export type PageSettings = {
       metaDescription: "Search the whole site.",
       layoutVariant: "minimal",
     },
+    "/tools/sha256visual": {
+      showBanner: false,
+      pageTitle: "SHA-256 Visualizer",
+      metaDescription: "An interactive visualization of the SHA-256 algorithm.",
+      layoutVariant: "minimal",
+    },
     "/404": {
       showBanner: false,
       pageTitle: "404 - Not found",

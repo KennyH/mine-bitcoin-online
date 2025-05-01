@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useId } from 'react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 
 /* --- Compact SHA-256 that emits per-round digests ---------------------- */
 
@@ -265,27 +266,48 @@ function Sha256Canvas() {
   };
   // --- End Effects and handlers ---
 
+  const messageInputId = "messageToHashId"
+
   return (
-    // Remove overflow-x-auto
     <div className="w-full max-w-full">
-    {/* Input */}
-    <div className="flex items-center gap-2 my-4">
-        <input
-        value={msg}
-        onChange={(e) => setMsg(e.target.value)}
-        placeholder="Enter message to hash..."
-        className="flex-1 p-2 bg-[#122126] text-[#e0f3f7] border border-[#28444a] rounded"
-        />
-    </div>
+      {/* Input */}
+      <div className="my-4">
+        <label
+          htmlFor={messageInputId}
+          className="block text-sm font-medium text-gray-300 mb-1"
+        >
+          Message to Hash:
+        </label>
+        <div className="relative">
+          <input
+            id={messageInputId}
+            value={msg}
+            onChange={(e) => setMsg(e.target.value)}
+            placeholder="Enter message..."
+            className="w-full p-2 pr-10 bg-[#122126] text-[#e0f3f7] border border-[#28444a] rounded focus:outline-none focus:ring-1 focus:ring-teal-500"
+            aria-describedby={messageInputId + "-description"}
+          />
+          {msg.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setMsg("")}
+              className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-200 focus:outline-none focus:ring-1 focus:ring-teal-500 rounded-r"
+              aria-label="Clear message"
+            >
+              <XMarkIcon className="w-5 h-5" />
+            </button>
+          )}
+        </div>
+        <p id={messageInputId + "-description"} className="text-xs text-gray-500 mt-1">
+          Type the message you want to use to visualize the SHA-256 hash algorithm.
+        </p>
+      </div>
 
     {/* Canvas: Set display width via CSS, keep attributes for resolution */}
     <canvas
         ref={canvasRef}
         width={internalCanvasWidth} // Internal drawing buffer width
         height={internalCanvasHeight} // Internal drawing buffer height
-        // Style sets display size: w-full makes it fit container width
-        // max-w-full ensures it doesn't exceed container if container is smaller than internal width
-        // height: auto maintains aspect ratio based on the display width (optional)
         className="border border-[#00eaff]/40 block w-full max-w-full h-auto"
     />
 
@@ -300,10 +322,10 @@ function Sha256Canvas() {
             onChange={handleSliderChange}
             className="w-full my-2"
         />
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 break-all">
             Round {frameIdx + 1}/{frames.length}
             {isAutoPlaying ? " (Auto-playing)" : ""}
-            &nbsp;&nbsp;|&nbsp;&nbsp;Digest: <code>{digest}</code>
+            &nbsp;&nbsp;|&nbsp;&nbsp;Digest:{" "}<code>{digest}</code>
         </p>
         </div>
     )}
@@ -313,16 +335,11 @@ function Sha256Canvas() {
 
 /* ------------------------------------------------------------------------ */
 
-export default function Sha256Page() {
+export default function Sha256Page(){
   return (
-    <>
-      <div>
-        <title>SHA-256 Visualizer</title>
-      </div>
-      <main className="flex flex-col items-center justify-center min-h-[60vh] text-[#e0e6ed]">
-        <h1 className="text-3xl font-bold mb-4">SHA-256 Visualizer</h1>
-        <Sha256Canvas />
-      </main>
-    </>
+    <div className="flex flex-col items-center justify-center min-h-[60vh]">
+      <h1 className="text-2xl font-bold mb-2">SHA-256 Visualizer</h1>
+      <Sha256Canvas />
+    </div>
   );
 }
