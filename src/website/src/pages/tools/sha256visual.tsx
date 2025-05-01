@@ -322,10 +322,20 @@ function Sha256Canvas() {
             className="w-full my-2"
         />
         <p className="text-sm text-gray-400 break-all">
-            Round {frameIdx + 1}/{frames.length}
-            {isAutoPlaying ? " (Auto-playing)" : ""}
-            &nbsp;&nbsp;|&nbsp;&nbsp;Digest:{" "}<code>{digest}</code>
-        </p>
+            {isAutoPlaying ? (
+              <>
+                (Auto-playing)
+                <br />
+              </>
+            ) : (
+              <br />
+            )}
+            <span className="inline-block min-w-[4.5rem] font-mono">
+              Round {(frameIdx + 1).toString().padStart(2, ' ')}/{frames.length}
+            </span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;Digest:{" "}
+            <code>{digest}</code>
+          </p>
         </div>
     )}
     </div>
