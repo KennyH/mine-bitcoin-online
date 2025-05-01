@@ -93,9 +93,9 @@ export default function PageHeader() {
             ) : null}
           </div>
 
-          {/* Right: Nav links, Start/Logout (on <md), search, hamburger */}
+          {/* Right: Nav links, Start/Logout (on <md), search (icon), hamburger */}
           <nav className="flex items-center gap-5 z-20">
-            {navLinks.map((link) => (
+            {navLinks.filter(l => l.label != "Search").map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
 
