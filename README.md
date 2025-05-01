@@ -3,6 +3,7 @@
 [![Website](https://img.shields.io/website?down_message=offline&label=Dev%20Site&up_message=online&url=https%3A%2F%2Fdev-env.bitcoinbrowserminer.com)](https://dev-env.bitcoinbrowserminer.com)
 [![Website](https://img.shields.io/website?down_message=offline&label=Prod%20Site&up_message=planned&url=https%3A%2F%2Fbitcoinbrowserminer.com)](https://bitcoinbrowserminer.com)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Under Development](https://img.shields.io/badge/Status-Under%20Development-yellow)](https://github.com/KennyH/mine-bitcoin-online)
 
 Mine Bitcoin (and testnet/regtest variants) directly in your web browser using WebAssembly, powered by block templates from a private Bitcoin node.
 
