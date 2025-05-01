@@ -83,53 +83,61 @@ export default function SignUpModal({
 
   return (
     <Modal open={open} onClose={() => { reset(); onClose(); }}>
-      {step === "form" && (
-        <div>
-          <div className="flex mb-4">
-            <button
-              className={`flex-1 py-2 font-semibold rounded-t ${tab === "signIn" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
-              onClick={() => handleTab("signIn")}
-              type="button"
-              name="signin-tab"
-              id="signin-tab"
-            >
-              Sign In
-            </button>
-            <button
-              className={`flex-1 py-2 font-semibold rounded-t ${tab === "signUp" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
-              onClick={() => handleTab("signUp")}
-              type="button"
-              name="signup-tab"
-              id="signup-tab"
-            >
-              Sign Up
-            </button>
-          </div>
-          {tab === "signUp" ? (
-            <form onSubmit={handleSignUp} className="flex flex-col gap-4">
+    {step === "form" && (
+      <div>
+        <div className="flex mb-4">
+          <button
+            className={`flex-1 py-2 font-semibold rounded-t ${tab === "signIn" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
+            onClick={() => handleTab("signIn")}
+            type="button"
+            id="signin-tab"
+            aria-label="Switch to Sign In"
+          >
+            Sign In
+          </button>
+          <button
+            className={`flex-1 py-2 font-semibold rounded-t ${tab === "signUp" ? "bg-[#23233a] text-[#f7931a]" : "bg-[#181a20] text-white"}`}
+            onClick={() => handleTab("signUp")}
+            type="button"
+            id="signup-tab"
+            aria-label="Switch to Sign Up"
+          >
+            Sign Up
+          </button>
+        </div>
+        {tab === "signUp" ? (
+          <form onSubmit={handleSignUp} className="flex flex-col gap-4">
+            <label htmlFor="signup-name" className="text-sm font-medium">
+              Name
               <input
                 type="text"
                 name="name"
                 id="signup-name"
                 autoComplete="name"
-                placeholder="Name"
-                className="p-2 rounded bg-[#23233a] text-white"
+                placeholder="Your Name"
+                className="p-2 rounded bg-[#23233a] text-white w-full"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
+                aria-label="Full Name"
               />
+            </label>
+            <label htmlFor="signup-email" className="text-sm font-medium">
+              Email
               <input
                 type="email"
                 name="email"
                 id="signup-email"
                 autoComplete="email"
-                placeholder="Email"
-                className="p-2 rounded bg-[#23233a] text-white"
+                placeholder="you@email.com"
+                className="p-2 rounded bg-[#23233a] text-white w-full"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
+                aria-label="Email Address"
               />
-              <label className="flex items-center gap-2">
+            </label>
+            <label htmlFor="signup-tos-checkbox" className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="tos-checkbox"
@@ -137,81 +145,91 @@ export default function SignUpModal({
                 checked={tosAccepted}
                 onChange={e => setTosAccepted(e.target.checked)}
                 required
+                aria-label="Agree to Terms of Service"
               />
               <span>
                 I agree to the <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">Terms of Service.</a>
               </span>
             </label>
-              <button
-                type="submit"
-                name="continue-submit"
-                id="signup-continue-submit"
-                className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
-                disabled={loading || !tosAccepted}
-              >
-                {loading ? "Sending code..." : "Sign Up & Continue"}
-              </button>
-              {error && <div className="text-red-400">{error}</div>}
-            </form>
-          ) : (
-            <form onSubmit={handleSignIn} className="flex flex-col gap-4">
+            <button
+              type="submit"
+              id="signup-continue-submit"
+              className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
+              disabled={loading || !tosAccepted}
+              aria-label="Sign Up and Continue"
+            >
+              {loading ? "Sending code..." : "Sign Up & Continue"}
+            </button>
+            {error && <div className="text-red-400">{error}</div>}
+          </form>
+        ) : (
+          <form onSubmit={handleSignIn} className="flex flex-col gap-4">
+            <label htmlFor="signin-email" className="text-sm font-medium">
+              Email
               <input
                 type="email"
                 name="email"
                 id="signin-email"
                 autoComplete="email"
-                placeholder="Email"
-                className="p-2 rounded bg-[#23233a] text-white"
+                placeholder="you@email.com"
+                className="p-2 rounded bg-[#23233a] text-white w-full"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
+                aria-label="Email Address"
               />
-              <button
-                type="submit"
-                name="continue-submit"
-                id="signip-continue-submit"
-                className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
-                disabled={loading}
-              >
-                {loading ? "Sending code..." : "Continue"}
-              </button>
-              {error && <div className="text-red-400">{error}</div>}
-            </form>
-          )}
-        </div>
-      )}
-      {step === "otp" && (
-        <form onSubmit={handleOtp} className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold mb-2">Enter the code sent to your email</h2>
+            </label>
+            <button
+              type="submit"
+              id="signin-continue-submit"
+              className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
+              disabled={loading}
+              aria-label="Continue"
+            >
+              {loading ? "Sending code..." : "Continue"}
+            </button>
+            {error && <div className="text-red-400">{error}</div>}
+          </form>
+        )}
+      </div>
+    )}
+    {step === "otp" && (
+      <form onSubmit={handleOtp} className="flex flex-col gap-4">
+        <h2 className="text-xl font-bold mb-2">Enter the code sent to your email</h2>
+        <label htmlFor="otp-code" className="text-sm font-medium">
+          Code
           <input
             type="text"
             name="otp"
             id="otp-code"
             autoComplete="one-time-code"
             placeholder="6-digit code"
-            className="p-2 rounded bg-[#23233a] text-white"
+            className="p-2 rounded bg-[#23233a] text-white w-full"
             value={otp}
             onChange={e => setOtp(e.target.value)}
             required
             maxLength={6}
+            aria-label="One-time code"
           />
-          <button
-            type="submit"
-            name="otp-submit"
-            id="otp-continue-submit"
-            className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
-            disabled={loading}
-          >
-            {loading ? "Verifying..." : "Verify"}
-          </button>
-          {error && <div className="text-red-400">{error}</div>}
-        </form>
-      )}
-      {step === "success" && (
-        <div className="text-green-400 text-center py-8">
-          Success! You are signed in.
-        </div>
-      )}
+        </label>
+        <button
+          type="submit"
+          id="otp-continue-submit"
+          className="bg-[#f7931a] text-white font-semibold py-2 rounded hover:bg-[#e07c00] transition"
+          disabled={loading}
+          aria-label="Verify"
+        >
+          {loading ? "Verifying..." : "Verify"}
+        </button>
+        {error && <div className="text-red-400">{error}</div>}
+      </form>
+    )}
+    {step === "success" && (
+      <div className="text-green-400 text-center py-8">
+        Success! You are signed in.
+      </div>
+    )}
     </Modal>
+
   );
 }

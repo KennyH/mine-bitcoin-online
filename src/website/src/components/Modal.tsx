@@ -16,7 +16,7 @@ export default function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
       <div className="bg-[#181a20] rounded-lg shadow-lg p-6 min-w-[320px] max-w-[90vw]">
         <button
-          className="absolute top-4 right-4 text-white text-2xl"
+          className="absolute top-4 right-4 text-white text-5xl p-3 rounded-full hover:bg-[#23233a] transition-all flex items-center justify-center"
           onClick={onClose}
           aria-label="Close"
         >
