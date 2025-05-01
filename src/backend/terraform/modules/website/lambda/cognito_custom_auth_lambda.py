@@ -108,11 +108,13 @@ def send_otp_email(code, to_email):
       <img src="https://dev-env.bitcoinbrowserminer.com/images/bitcoin.png" alt="Bitcoin Browser Miner Logo" width="64" style="margin-bottom: 16px;" />
       <h2>Your Bitcoin Browser Miner Login Code</h2>
     </div>
-    <p style="font-size:1.2em; font-weight:bold; letter-spacing:2px;">{ios_otp_line}</p>
+    <p>
+      <code style="font-size: 1.5em; background: #f2f2f2; padding: 4px 8px; border-radius: 4px;">{code}</code>
+      <strong> is your verification code.</strong>
+    </p>
     <p>Use this code to log in. It is valid for 3 minutes.</p>
     <p style="color: gray;">If you did not request this code, you can safely ignore this email.</p>
-  </body>
-</html>"""
+  </body></html>"""
 
     response = ses.send_email(
         Source=FROM_EMAIL,
