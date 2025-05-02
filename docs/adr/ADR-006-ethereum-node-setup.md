@@ -47,7 +47,7 @@ This setup will provide the necessary infrastructure to:
     *   Chosen hardware (16GB RAM, NVMe SSD) provides sufficient resources for stable operation.
     *   Contributes to Ethereum network health and decentralization.
     *   Improves client diversity by using Nethermind and Lighthouse.
-    *   Leverages user's technical interest in .NET and Rust.
+    *   Leverages author's technical interest in .NET and Rust.
 *   **Cons:**
     *   Requires initial setup effort and ongoing maintenance (client updates, monitoring).
     *   Consumes local hardware resources (CPU, RAM, disk space, bandwidth) on the Pi.
