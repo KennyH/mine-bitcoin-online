@@ -1,103 +1,157 @@
-import secrets
-import boto3
+from __future__ import annotations
+
 import logging
 import os
+import secrets
+from typing import Any
 
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-logger = logging.getLogger()
-logger.setLevel(getattr(logging, LOG_LEVEL, logging.INFO))
+import boto3
+from botocore.exceptions import ClientError
 
-ses = boto3.client("ses", region_name="us-west-2")
-FROM_EMAIL = "noreply@bitcoinbrowserminer.com"
+# ────────────────────────────  Configuration  ─────────────────────────────── #
 
-def lambda_handler(event, context):
+LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+logging.basicConfig(level=LOG_LEVEL, force=True)  # ensure root logger obeys env
+logger = logging.getLogger(__name__)
+
+REGION = os.getenv("AWS_REGION", "us-west-2")
+ses = boto3.client("ses", region_name=REGION)
+
+FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@bitcoinbrowserminer.com")
+ASSETS_BASE = os.getenv("ASSETS_BASE", "https://assets.bitcoinbrowserminer.com")
+IMG_LINK = os.getenv("IMG_LINK", f"{ASSETS_BASE}/images/bitcoin.png")
+
+OTP_LENGTH = 6
+OTP_TTL_MIN = int(os.getenv("OTP_TTL_MIN", "3"))
+
+# ────────────────────────────  Lambda entry‑point  ────────────────────────── #
+
+
+def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
     logger.info("Lambda triggered. Event: %s", event)
+
     trigger_source = event.get("triggerSource")
     logger.info("Trigger source: %s", trigger_source)
-    trigger_handlers = {
+
+    trigger_handlers: dict[str, callable[[dict[str, Any], Any], dict[str, Any]]] = {
         "PreSignUp_SignUp": handle_pre_sign_up,
         "DefineAuthChallenge_Authentication": handle_define_auth_challenge,
         "CreateAuthChallenge_Authentication": handle_create_auth_challenge,
-        "VerifyAuthChallengeResponse_Authentication": handle_verify_auth_challenge
+        "VerifyAuthChallengeResponse_Authentication": handle_verify_auth_challenge,
     }
 
-    handler_function = trigger_handlers.get(trigger_source)
-    if not handler_function:
+    handler = trigger_handlers.get(trigger_source)
+    if not handler:
         logger.warning("No handler for trigger source: %s", trigger_source)
         return event
 
-    return handler_function(event, context)
+    return handler(event, context)
 
 
-def handle_pre_sign_up(event, context):
-    logger.info("PreSignUp: Auto-confirming and auto-verifying user.")
-    tos_accepted = event["request"]["userAttributes"].get("custom:tos_accepted")
-    if tos_accepted != "true":
-        logger.warning("User did not accept ToS. Rejecting sign-up.")
+# ────────────────────────────  Pre‑Sign‑Up  ───────────────────────────────── #
+
+
+def handle_pre_sign_up(event: dict[str, Any], context: Any) -> dict[str, Any]:
+    logger.info("PreSignUp: auto-confirming and auto-verifying user.")
+
+    attributes = event.get("request", {}).get("userAttributes", {})
+    if attributes.get("custom:tos_accepted") != "true":
+        logger.warning("User did not accept ToS. Rejecting sign up.")
         raise Exception("You must accept the Terms of Service to sign up.")
+
     event["response"]["autoConfirmUser"] = True
     event["response"]["autoVerifyEmail"] = True
     return event
 
-def handle_define_auth_challenge(event, context):
-    session = event["request"]["session"]
-    logger.info("DefineAuthChallenge: Session: %s", session)
 
-    if len(session) == 0:
+# ────────────────────────────  Define Auth Challenge  ──────────────────────── #
+
+
+def handle_define_auth_challenge(
+    event: dict[str, Any], context: Any
+) -> dict[str, Any]:
+    session = event.get("request", {}).get("session", [])
+    logger.info("DefineAuthChallenge: session %s", session)
+
+    if not session:
         logger.info("No session, issuing CUSTOM_CHALLENGE.")
-        event["response"]["challengeName"] = "CUSTOM_CHALLENGE"
-        event["response"]["issueTokens"] = False
-        event["response"]["failAuthentication"] = False
+        event["response"].update(
+            {
+                "challengeName": "CUSTOM_CHALLENGE",
+                "issueTokens": False,
+                "failAuthentication": False,
+            }
+        )
+        return event
+
+    last = session[-1]
+    if (
+        last.get("challengeName") == "CUSTOM_CHALLENGE"
+        and last.get("challengeResult") is True
+    ):
+        logger.info("Previous challenge succeeded, issuing tokens.")
+        event["response"].update({"issueTokens": True, "failAuthentication": False})
     else:
-        last = session[-1]
-        if last["challengeName"] == "CUSTOM_CHALLENGE" and last["challengeResult"]:
-            logger.info("Previous challenge succeeded, issuing tokens.")
-            event["response"]["issueTokens"] = True
-            event["response"]["failAuthentication"] = False
-        else:
-            logger.info("Previous challenge failed or not present, issuing another CUSTOM_CHALLENGE.")
-            event["response"]["challengeName"] = "CUSTOM_CHALLENGE"
-            event["response"]["issueTokens"] = False
-            event["response"]["failAuthentication"] = False
-
+        logger.info("Previous challenge failed, issuing another CUSTOM_CHALLENGE.")
+        event["response"].update(
+            {
+                "challengeName": "CUSTOM_CHALLENGE",
+                "issueTokens": False,
+                "failAuthentication": False,
+            }
+        )
     return event
 
 
-def handle_create_auth_challenge(event, context):
+# ────────────────────────────  Create Auth Challenge  ─────────────────────── #
+
+
+def _one_time_code() -> str:
+    return f"{secrets.randbelow(10**OTP_LENGTH):0{OTP_LENGTH}}"
+
+
+def handle_create_auth_challenge(
+    event: dict[str, Any], context: Any
+) -> dict[str, Any]:
     logger.info("CreateAuthChallenge triggered.")
-    if event["request"]["challengeName"] == "CUSTOM_CHALLENGE":
-        challenge_code = str(secrets.randbelow(10**6)).zfill(6)
-        user_attributes = event["request"].get("userAttributes", {})
-        email = user_attributes.get("email")
-        logger.info("Generated OTP code %s for email %s", challenge_code, email)
 
-        event["response"]["publicChallengeParameters"] = {
-            "email": email
-        }
-        event["response"]["privateChallengeParameters"] = {
-            "answer": challenge_code
-        }
+    if event["request"].get("challengeName") != "CUSTOM_CHALLENGE":
+        return event
 
-        if email:
-            try:
-                logger.info("Attempting to send OTP code to %s", email)
-                send_otp_email(challenge_code, email)
-                logger.info("Email sent successfully.")
-            except Exception as e:
-                logger.error("Error sending email: %s", e)
-        else:
-            logger.warning("No email found in userAttributes; cannot send OTP.")
+    code = _one_time_code()
+    email = event["request"].get("userAttributes", {}).get("email")
+
+    logger.info("Generated OTP %s-**** for %s", code[:2], email)
+
+    event["response"]["publicChallengeParameters"] = {"email": email}
+    event["response"]["privateChallengeParameters"] = {"answer": code}
+
+    if not email:
+        logger.warning("No email in userAttributes; cannot send OTP.")
+        return event
+
+    try:
+        logger.info("Sending OTP code to %s", email)
+        send_otp_email(code, email)
+        logger.info("Email sent successfully.")
+    except ClientError as exc:
+        logger.error("SES error: %s", exc.response["Error"]["Message"])
+    except Exception as exc:
+        logger.exception("Unexpected error sending OTP: %s", exc)
+
     return event
 
 
-#TODO: Make a static assets location like https://assets.bitcoinbrowserminer.com/logo.png
-def send_otp_email(code, to_email):
+# ────────────────────────────  SES Email Sender  ──────────────────────────── #
+
+
+def send_otp_email(code: str, to_email: str) -> None:
     subject = "Your Bitcoin Browser Miner Login Code"
     ios_otp_line = f"{code} is your Bitcoin Browser Miner code."
 
     body_text = (
         f"{ios_otp_line}\n\n"
-        "Use this code to log in. It is valid for 3 minutes.\n"
+        f"Use this code to log in. It is valid for {OTP_TTL_MIN} minutes.\n"
         "If you did not request this code, please ignore this email."
     )
 
@@ -105,15 +159,18 @@ def send_otp_email(code, to_email):
   <head></head>
   <body style="font-family: sans-serif; line-height: 1.6; color: #1a1a1a;">
     <div style="text-align: center;">
-      <img src="https://dev-env.bitcoinbrowserminer.com/images/bitcoin.png" alt="Bitcoin Browser Miner Logo" width="64" style="margin-bottom: 16px;" />
+      <img src="{IMG_LINK}" alt="Bitcoin Browser Miner Logo" width="64"
+           style="margin-bottom: 16px;" />
       <h2>Your Bitcoin Browser Miner Login Code</h2>
     </div>
     <p>
-      <code style="font-size: 1.5em; background: #f2f2f2; padding: 4px 8px; border-radius: 4px;">{code}</code>
+      <code style="font-size: 1.5em; background: #f2f2f2; padding: 4px 8px;
+                   border-radius: 4px;">{code}</code>
       <strong> is your verification code.</strong>
     </p>
-    <p>Use this code to log in. It is valid for 3 minutes.</p>
-    <p style="color: gray;">If you did not request this code, you can safely ignore this email.</p>
+    <p>Use this code to log in. It is valid for {OTP_TTL_MIN} minutes.</p>
+    <p style="color: gray;">If you did not request this code, you can safely
+       ignore this email.</p>
   </body></html>"""
 
     response = ses.send_email(
@@ -121,19 +178,21 @@ def send_otp_email(code, to_email):
         Destination={"ToAddresses": [to_email]},
         Message={
             "Subject": {"Data": subject},
-            "Body": {
-                "Text": {"Data": body_text},
-                "Html": {"Data": body_html},
-            },
+            "Body": {"Text": {"Data": body_text}, "Html": {"Data": body_html}},
         },
     )
     logger.debug("SES send_email response: %s", response)
 
 
-def handle_verify_auth_challenge(event, context):
-    expected_answer = event["request"]["privateChallengeParameters"].get("answer")
-    user_answer = event["request"]["challengeAnswer"]
-    logger.info("Verifying challenge: expected %s, got %s", expected_answer, user_answer)
-    event["response"]["answerCorrect"] = user_answer == expected_answer
-    return event
+# ────────────────────────────  Verify Auth Challenge  ─────────────────────── #
 
+
+def handle_verify_auth_challenge(
+    event: dict[str, Any], context: Any
+) -> dict[str, Any]:
+    expected = event["request"]["privateChallengeParameters"].get("answer")
+    supplied = event["request"].get("challengeAnswer")
+
+    logger.info("Verifying challenge: expected %s, got %s", expected, supplied)
+    event["response"]["answerCorrect"] = supplied == expected
+    return event
