@@ -1,5 +1,5 @@
 resource "aws_iam_role" "cf_turnstile_lambda_role" {
-  name = "${var.environment}-cf-turnstile-lambda-role"
+  name               = "${var.environment}-mine-bitcoin-online-cf-turnstile-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_trust.json
 }
 
@@ -15,7 +15,7 @@ data "archive_file" "cf_turnstile_lambda_zip" {
 }
 
 resource "aws_lambda_function" "cf_turnstile_lambda" {
-  function_name = "${var.environment}-cf-turnstile-lambda"
+  function_name = "${var.environment}-mine-bitcoin-online-cf-turnstile-lambda"
   role          = aws_iam_role.cf_turnstile_lambda_role.arn
   handler       = "cf_turnstile_lambda.lambda_handler"
   runtime       = "python3.11"

@@ -1,8 +1,9 @@
 resource "aws_apigatewayv2_api" "cf_turnstile_api" {
-  name          = "${var.environment}-cf-turnstile-api"
+  name          = "${var.environment}-mine-bitcoin-online-cf-turnstile-api"
   protocol_type = "HTTP"
   description   = "API Gateway for Cloudflare Turnstile verification"
 
+  # TODO get this from variables
   cors_configuration {
     allow_origins = var.environment == "dev" ? [
       "https://dev-env.bitcoinbrowserminer.com",
