@@ -32,6 +32,11 @@ resource "aws_lambda_function" "cf_turnstile_lambda" {
   }
 
   timeout = 10
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
+  }
 }
 
 resource "aws_cloudwatch_log_group" "cf_turnstile_lambda_log_group" {

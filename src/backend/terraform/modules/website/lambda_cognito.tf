@@ -19,6 +19,7 @@ resource "aws_lambda_function" "cognito_custom_auth_lambda" {
   role          = aws_iam_role.cognito_custom_auth_lambda_role.arn
   handler       = "cognito_custom_auth_lambda.lambda_handler"
   runtime       = "python3.11"
+  
   filename      = data.archive_file.cognito_custom_auth_lambda_zip.output_path
   source_code_hash = data.archive_file.cognito_custom_auth_lambda_zip.output_base64sha256
 
@@ -27,6 +28,11 @@ resource "aws_lambda_function" "cognito_custom_auth_lambda" {
       ENVIRONMENT = var.environment
       LOG_LEVEL = var.environment == "prod" ? "ERROR" : "INFO"
     }
+  }
+
+  tags = {
+    Environment = var.environment
+    Project     = var.project_name
   }
 }
 
