@@ -87,6 +87,7 @@ We use Architecture Decision Records (ADRs) to document significant architectura
 *   [ADR-003](./docs/adr/ADR-003-browser-miner-implementation.md): Initial Browser Miner Implementation (Web Worker + Single-Threaded WASM).
 *   [ADR-004](./docs/adr/ADR-004-static-website-hosting-strategy.md): Static Website Hosting on AWS S3/CloudFront.
 *   [ADR-005](./docs/adr/ADR-005-captcha-provider-selection.md): CAPTCHA Provider Selection (Cloudflare Turnstile for privacy and cost).
+*   [ADR-006](./docs/adr/ADR-006-ethereum-node-setup.md): Ethereum Node Setup (Nethermind + Lighthouse for client diversity and direct access).
 
 ## To Do List (High-Level)
 
