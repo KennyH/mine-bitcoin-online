@@ -8,7 +8,7 @@
 
 **Context:**
 
-To support the future goal of deploying and interacting with an Ethereum smart contract for Bitcoin mining reward distribution (detailed in ADR-002), we need reliable access to the Ethereum network. Relying solely on third-party services can introduce costs, rate limits, and potential points of failure. We have acquired dedicated hardware (Raspberry Pi 5, 16GB RAM, 2TB NVMe SSD) suitable for running a full Ethereum node. Running our own node provides direct, trustless access for reading blockchain data and submitting transactions. Since The Merge, a full node requires both an Execution Layer (EL) client and a Consensus Layer (CL) client. We do not plan to stake 32 ETH, so this will be a non-validating node. Choosing clients other than the most dominant ones helps improve the network's client diversity.
+To support the future goal of deploying and interacting with an Ethereum smart contract for Bitcoin mining reward distribution (detailed in [ADR-002](./ADR-002-block-reward-distribution-and-user-payout.md)), we need reliable access to the Ethereum network. Relying solely on third-party services can introduce costs, rate limits, and potential points of failure. We have acquired dedicated hardware (Raspberry Pi 5, 16GB RAM, 2TB NVMe SSD) suitable for running a full Ethereum node. Running our own node provides direct, trustless access for reading blockchain data and submitting transactions. Since The Merge, a full node requires both an Execution Layer (EL) client and a Consensus Layer (CL) client. We do not plan to stake 32 ETH, so this will be a non-validating node. Choosing clients other than the most dominant ones helps improve the network's client diversity.
 
 ---
 
@@ -43,7 +43,7 @@ This setup will provide the necessary infrastructure to:
 *   **Pros:**
     *   Provides direct, reliable, and trustless read/write access to the Ethereum network.
     *   Avoids reliance on third-party API providers and their potential limitations/costs.
-    *   Supports the planned smart contract deployment and interaction (ADR-002).
+    *   Supports the planned smart contract deployment and interaction ([ADR-002](./ADR-002-block-reward-distribution-and-user-payout.md)).
     *   Chosen hardware (16GB RAM, NVMe SSD) provides sufficient resources for stable operation.
     *   Contributes to Ethereum network health and decentralization.
     *   Improves client diversity by using Nethermind and Lighthouse.
