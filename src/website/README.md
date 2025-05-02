@@ -16,7 +16,7 @@ These services and the site are deployed via GitHub actions with Terraform (see:
 
 ## Setting up local environment
 
-- Copy `.env.local.example` to `.env.local` and fill in the necessary credentials and secrets. You csan get these after deploying the terraform and logging into AWS Console for Cognito. You will also need to [open a Cloudflare account](https://dash.cloudflare.com/sign-up) and create a new Turnstyle component (and get/set the site (for nextjs) and secret (for terraform) keys).
+- Copy `.env.local.example` to `.env.local` and fill in the necessary credentials and secrets. You csan get these after deploying the terraform and logging into AWS Console for Cognito. You will also need to [open a Cloudflare account](https://dash.cloudflare.com/sign-up) and create a new Turnstyle component (and get/set the site (for nextjs) and secret (for terraform) keys. --make sure you add `localhost` to the allowed hostname, for local dev env).
 
 ```bash
 cp .env.local.example .env.local
