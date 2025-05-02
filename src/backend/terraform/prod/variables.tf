@@ -10,3 +10,8 @@ variable "aws_region" {
   type    = string
   default = "us-west-2"
 }
+
+variable "turnstile_secret_key" {
+  type = string
+  sensitive   = true
+}

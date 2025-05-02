@@ -16,7 +16,7 @@ LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO").upper()
 TURNSTILE_SECRET_KEY: Optional[str] = os.getenv("TURNSTILE_SECRET_KEY")
 TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 
-logging.basicConfig(level=LOG_LEVEL)
+logging.basicConfig(level=LOG_LEVEL, force=True)
 logger = logging.getLogger(__name__)
 
 COMMON_HEADERS: dict[str, str] = {
@@ -29,7 +29,7 @@ COMMON_HEADERS: dict[str, str] = {
 
 
 def _response(status: int, body: dict[str, Any]) -> dict[str, Any]:
-    """Return a payload shaped for API Gateway/Lambda proxy integration."""
+    """Return a payload shaped for API Gateway/Lambda proxy integration."""
     return {"statusCode": status, "headers": COMMON_HEADERS, "body": json.dumps(body)}
 
 
@@ -85,7 +85,7 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
             event.get("requestContext", {}).get("http", {}).get("sourceIp")
         )
 
-        logger.info("Verifying token %s… ip=%s", token[:5], remote_ip)
+        logger.info("Verifying token %s... ip=%s", token[:5], remote_ip)
 
         result = _verify_with_turnstile(token, remote_ip)
 

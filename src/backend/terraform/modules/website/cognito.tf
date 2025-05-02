@@ -87,7 +87,6 @@ resource "aws_cognito_user_pool" "user_pool" {
   }
 }
 
-
 # Cognito User Pool Client (Passwordless)
 resource "aws_cognito_user_pool_client" "user_pool_client" {
   name                 = "minebitcoinonline-user-pool-client-${var.environment}"

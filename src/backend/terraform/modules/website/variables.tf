@@ -11,6 +11,7 @@ variable "domain_name" {
 variable "turnstile_secret_key" {
   description = "Cloudflare secret key for turnstile"
   type = string
+  sensitive   = true
 }
 
 variable "aws_route53_zone_name" {

@@ -3,16 +3,6 @@ resource "aws_iam_role" "cognito_custom_auth_lambda_role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_trust.json
 }
 
-data "aws_iam_policy_document" "lambda_trust" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role_policy_attachment" "cognito_custom_auth_lambda_attach" {
   role       = aws_iam_role.cognito_custom_auth_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

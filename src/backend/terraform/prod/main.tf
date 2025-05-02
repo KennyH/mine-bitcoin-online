@@ -9,10 +9,11 @@ provider "aws" {
 }
 
 module "website" {
-  source             = "../modules/website"
-  environment        = var.environment
-  domain_name        = var.domain_name
-  aws_region         = var.aws_region
+  source               = "../modules/website"
+  environment          = var.environment
+  domain_name          = var.domain_name
+  aws_region           = var.aws_region
+  turnstile_secret_key = var.turnstile_secret_key
 
   providers = {
     aws.acm = aws.useast1
