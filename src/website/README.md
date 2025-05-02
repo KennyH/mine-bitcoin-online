@@ -8,6 +8,7 @@ The site is a [Next.js](https://nextjs.org) project bootstrapped with [`create-n
 - S3
 - CloudFront
 - Cognito (with some lambdas to support OTP logins)
+- Cloudflare Turnstile (with a lambda)
 - Route53
 - API Gateway (and lambdas)
 
@@ -15,7 +16,7 @@ These services and the site are deployed via GitHub actions with Terraform (see:
 
 ## Setting up local environment
 
-- Copy `.env.local.example` to `.env.local` and fill in the necessary credentials and secrets. You csan get these after deploying the terraform and logging into AWS Console for Cognito.
+- Copy `.env.local.example` to `.env.local` and fill in the necessary credentials and secrets. You csan get these after deploying the terraform and logging into AWS Console for Cognito. You will also need to [open a Cloudflare account](https://dash.cloudflare.com/sign-up) and create a new Turnstyle component (and get/set the site (for nextjs) and secret (for terraform) keys).
 
 ```bash
 cp .env.local.example .env.local
