@@ -21,13 +21,16 @@ jobs:
       id-token: write
       contents: read
 
-    env:
-      TF_VAR_environment: ${{ inputs.environment }}
-      TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+    
+      - name: Set uppercase environment variable
+        id: vars
+        run: |
+          env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
+          echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
+          echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -56,10 +59,18 @@ jobs:
 
       - name: Terraform Plan
         working-directory: src/backend/terraform/${{ inputs.environment }}
+        env:
+          TF_VAR_environment: ${{ inputs.environment }}
+          TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
+          TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
         run: terraform plan
 
       - name: Terraform Apply
         working-directory: src/backend/terraform/${{ inputs.environment }}
+        env:
+          TF_VAR_environment: ${{ inputs.environment }}
+          TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
+          TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
         run: terraform apply -auto-approve
 
   deploy-nextjs:
@@ -104,6 +115,7 @@ jobs:
           NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_AWS_REGION: ${{ secrets[format('{0}_NEXT_PUBLIC_AWS_REGION', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_SITE_KEY', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
           NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
         run: |

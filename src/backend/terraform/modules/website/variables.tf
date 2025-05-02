@@ -8,6 +8,11 @@ variable "domain_name" {
   type        = string
 }
 
+variable "turnstile_secret_key" {
+  description = "Cloudflare secret key for turnstile"
+  type = string
+}
+
 variable "aws_route53_zone_name" {
   description = "custom domain name for site"
   type        = string
