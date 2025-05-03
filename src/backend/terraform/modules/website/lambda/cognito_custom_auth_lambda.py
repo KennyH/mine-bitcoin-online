@@ -118,9 +118,17 @@ def handle_create_auth_challenge(
     if event["request"].get("challengeName") != "CUSTOM_CHALLENGE":
         return event
 
-    code = _one_time_code()
     email = event["request"].get("userAttributes", {}).get("email")
+    if not email:
+        # Tell Cognito to stop and mark auth as failed
+        event["response"].update({
+            "failAuthentication": True,
+            "issueTokens": False,
+            "publicChallengeParameters": { "error": "NO_EMAIL" }
+        })
+        return event
 
+    code = _one_time_code()
     logger.info("Generated OTP %s-**** for %s", code[:2], email)
 
     event["response"]["publicChallengeParameters"] = {"email": email}
