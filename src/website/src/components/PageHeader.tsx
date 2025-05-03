@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -42,11 +42,18 @@ export default function PageHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const { user, loading, logout } = useCognitoUser();
+  const [createdUser, setCreatedUser] = useState(false);
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     logout();
   };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCreatedUser(localStorage.getItem("created_user") === "true");
+    }
+  }, []);
 
   return (
     <>
@@ -145,7 +152,7 @@ export default function PageHeader() {
             </button>
           </nav>
 
-          <SignUpModal open={showSignUp} onClose={() => setShowSignUp(false)} />
+          <SignUpModal open={showSignUp} onClose={() => setShowSignUp(false)} createdUser={createdUser}/>
 
           {/* Hamburger menu overlay */}
           {menuOpen && (
