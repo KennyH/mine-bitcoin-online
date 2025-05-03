@@ -42,7 +42,8 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   function_name = aws_lambda_function.cf_turnstile_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.cf_turnstile_api.execution_arn}/*/${aws_apigatewayv2_route.cf_turnstile_verify_route.route_key}"
+  # Allow ANY method / ANY route
+  source_arn = "${aws_apigatewayv2_api.cf_turnstile_api.execution_arn}/*/*"
 }
 
 #TEMP
