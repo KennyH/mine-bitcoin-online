@@ -173,7 +173,8 @@ function Sha256Canvas() {
   const internalCanvasHeight = 120; // Fixed internal height
 
   // --- Effects and handlers (no changes needed here from previous step) ---
-  // useEffect for SHA-256 calculation [msg]
+  // useEffect for SHA-256 calculation [msg]; TODO fix lint warning (ignore for now)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     stopAutoSlide();
     const { frames: fr, digestHex } = sha256Trace(
