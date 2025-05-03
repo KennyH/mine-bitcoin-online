@@ -86,9 +86,7 @@ def lambda_handler(event: dict[str, Any], context: Any) -> dict[str, Any]:
         )
 
         logger.info("Verifying token %s... ip=%s", token[:5], remote_ip)
-
         result = _verify_with_turnstile(token, remote_ip)
-        logger.info("Turnstile result: %s", result) # TEMP
 
         if result.get("success"):
             return _response(200, {"success": True, "message": "Token verified"})

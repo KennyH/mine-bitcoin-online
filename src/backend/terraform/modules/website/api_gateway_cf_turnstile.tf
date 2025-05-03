@@ -30,11 +30,17 @@ resource "aws_apigatewayv2_route" "cf_turnstile_verify_route" {
   target    = "integrations/${aws_apigatewayv2_integration.cf_turnstile_lambda_integration.id}"
 }
 
-# resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
-#   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
-#   name        = "$default"
-#   auto_deploy = true
-# }
+resource "aws_apigatewayv2_route" "cf_turnstile_root_route" {
+  api_id    = aws_apigatewayv2_api.cf_turnstile_api.id
+  route_key = "POST /{proxy+}"  # greedy... catch everything
+  target    = "integrations/${aws_apigatewayv2_integration.cf_turnstile_lambda_integration.id}"
+}
+
+resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+  name        = "$default"
+  auto_deploy = true
+}
 
 resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -46,53 +52,53 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   source_arn = "${aws_apigatewayv2_api.cf_turnstile_api.execution_arn}/*/*"
 }
 
-#TEMP
-resource "aws_cloudwatch_log_group" "cf_turnstile_api_logs" {
-  name              = "/aws/apigateway/${var.environment}-turnstile-access"
-  retention_in_days = 1
-}
+#TEMP - use if logs are needed
+# resource "aws_cloudwatch_log_group" "cf_turnstile_api_logs" {
+#   name              = "/aws/apigateway/${var.environment}-turnstile-access"
+#   retention_in_days = 1
+# }
 
-resource "aws_cloudwatch_log_resource_policy" "allow_apigw_logs" {
-  policy_name = "ApiGatewayAccessLogs-${var.environment}"
+# resource "aws_cloudwatch_log_resource_policy" "allow_apigw_logs" {
+#   policy_name = "ApiGatewayAccessLogs-${var.environment}"
 
-  policy_document = jsonencode({
-    Version   = "2012-10-17"
-    Statement = [
-      {
-        Sid       = "AllowApiGatewayLogs"
-        Effect    = "Allow"
-        Principal = { Service = "apigateway.amazonaws.com" }
-        Action    = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "${aws_cloudwatch_log_group.cf_turnstile_api_logs.arn}:*"
-      }
-    ]
-  })
-}
+#   policy_document = jsonencode({
+#     Version   = "2012-10-17"
+#     Statement = [
+#       {
+#         Sid       = "AllowApiGatewayLogs"
+#         Effect    = "Allow"
+#         Principal = { Service = "apigateway.amazonaws.com" }
+#         Action    = [
+#           "logs:CreateLogStream",
+#           "logs:PutLogEvents"
+#         ]
+#         Resource = "${aws_cloudwatch_log_group.cf_turnstile_api_logs.arn}:*"
+#       }
+#     ]
+#   })
+# }
 
-resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
-  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
-  name        = "$default"
-  auto_deploy = true
+# resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+#   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+#   name        = "$default"
+#   auto_deploy = true
 
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.cf_turnstile_api_logs.arn
+#   access_log_settings {
+#     destination_arn = aws_cloudwatch_log_group.cf_turnstile_api_logs.arn
 
-    format = jsonencode({
-      requestId           = "$context.requestId"
-      ip                  = "$context.identity.sourceIp"
-      requestTime         = "$context.requestTime"
-      routeKey            = "$context.routeKey"
-      status              = "$context.status"
-      latency             = "$context.responseLatency"
-      integrationStatus   = "$context.integration.status"
-      integrationLatency  = "$context.integration.latency"
-      errorMessage        = "$context.error.message"
-    })
-  }
+#     format = jsonencode({
+#       requestId           = "$context.requestId"
+#       ip                  = "$context.identity.sourceIp"
+#       requestTime         = "$context.requestTime"
+#       routeKey            = "$context.routeKey"
+#       status              = "$context.status"
+#       latency             = "$context.responseLatency"
+#       integrationStatus   = "$context.integration.status"
+#       integrationLatency  = "$context.integration.latency"
+#       errorMessage        = "$context.error.message"
+#     })
+#   }
 
-  depends_on = [aws_cloudwatch_log_resource_policy.allow_apigw_logs]
-}
+#   depends_on = [aws_cloudwatch_log_resource_policy.allow_apigw_logs]
+# }
 

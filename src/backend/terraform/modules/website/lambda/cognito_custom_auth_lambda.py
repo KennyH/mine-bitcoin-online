@@ -18,8 +18,10 @@ REGION = os.getenv("AWS_REGION", "us-west-2")
 ses = boto3.client("ses", region_name=REGION)
 
 FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@bitcoinbrowserminer.com")
-ASSETS_BASE = os.getenv("ASSETS_BASE", "https://assets.bitcoinbrowserminer.com")
-IMG_LINK = os.getenv("IMG_LINK", f"{ASSETS_BASE}/images/bitcoin.png")
+# TODO make a static assests location
+# ASSETS_BASE = os.getenv("ASSETS_BASE", "https://assets.bitcoinbrowserminer.com")
+# IMG_LINK = os.getenv("IMG_LINK", f"{ASSETS_BASE}/images/bitcoin.png")
+IMG_LINK = os.getenv("IMG_LINK", f"https://dev-env.bitcoinbrowserminer.com/images/bitcoin.png")
 
 OTP_LENGTH = 6
 OTP_TTL_MIN = int(os.getenv("OTP_TTL_MIN", "3"))
