@@ -30,11 +30,11 @@ resource "aws_apigatewayv2_route" "cf_turnstile_verify_route" {
   target    = "integrations/${aws_apigatewayv2_integration.cf_turnstile_lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
-  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
-  name        = "$default"
-  auto_deploy = true
-}
+# resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+#   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+#   name        = "$default"
+#   auto_deploy = true
+# }
 
 resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -43,5 +43,33 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.cf_turnstile_api.execution_arn}/*/${aws_apigatewayv2_route.cf_turnstile_verify_route.route_key}"
+}
+
+#TEMP
+resource "aws_cloudwatch_log_group" "cf_turnstile_api_logs" {
+  name              = "/aws/apigateway/${var.environment}-turnstile-access"
+  retention_in_days = 2
+}
+
+resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+  name        = "$default"
+  auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.cf_turnstile_api_logs.arn
+
+    format = jsonencode({
+      requestId           = "$context.requestId"
+      ip                  = "$context.identity.sourceIp"
+      requestTime         = "$context.requestTime"
+      routeKey            = "$context.routeKey"
+      status              = "$context.status"
+      latency             = "$context.responseLatency"
+      integrationStatus   = "$context.integration.status"
+      integrationLatency  = "$context.integration.latency"
+      errorMessage        = "$context.error.message"
+    })
+  }
 }
 
