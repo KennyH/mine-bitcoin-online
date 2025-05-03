@@ -120,13 +120,11 @@ def handle_create_auth_challenge(
 
     email = event["request"].get("userAttributes", {}).get("email")
     if not email:
-        # Tell Cognito to stop and mark auth as failed
+        logger.warning("No email in userAttributes; cannot send OTP; tell user to sign up.")
         event["response"] = {
-            "publicChallengeParameters": { "error": "NO_EMAIL" },
+            "publicChallengeParameters":  {"error": "NO_EMAIL"},
             "privateChallengeParameters": {},
-            "challengeMetadata": "NO_EMAIL",
-            "failAuthentication": True,
-            "issueTokens": False,
+            "challengeMetadata":          "NO_EMAIL"
         }
         return event
 
@@ -135,10 +133,6 @@ def handle_create_auth_challenge(
 
     event["response"]["publicChallengeParameters"] = {"email": email}
     event["response"]["privateChallengeParameters"] = {"answer": code}
-
-    if not email:
-        logger.warning("No email in userAttributes; cannot send OTP.")
-        return event
 
     try:
         logger.info("Sending OTP code to %s", email)
