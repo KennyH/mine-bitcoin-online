@@ -21,7 +21,8 @@
     "next-sitemap": "^4.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "turnstile-next": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

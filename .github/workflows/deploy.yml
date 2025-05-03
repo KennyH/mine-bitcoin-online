@@ -116,6 +116,7 @@ jobs:
           NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_AWS_REGION: ${{ secrets[format('{0}_NEXT_PUBLIC_AWS_REGION', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_SITE_KEY', steps.vars.outputs.env_upper)] }}
+          NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT', steps.vars.outputs.env_upper)] }}
           NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
           NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
         run: |
