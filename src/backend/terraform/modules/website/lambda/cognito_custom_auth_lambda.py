@@ -121,11 +121,9 @@ def handle_create_auth_challenge(
     email = event["request"].get("userAttributes", {}).get("email")
     if not email:
         # Tell Cognito to stop and mark auth as failed
-        event["response"].update({
-            "failAuthentication": True,
-            "issueTokens": False,
-            "publicChallengeParameters": { "error": "NO_EMAIL" }
-        })
+        event["response"]["failAuthentication"] = True
+        event["response"]["issueTokens"] = False
+        event["response"]["publicChallengeParameters"] = { "error": "NO_EMAIL" }
         return event
 
     code = _one_time_code()
