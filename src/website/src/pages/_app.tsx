@@ -7,7 +7,6 @@ import './globals.css';
 import { CognitoUserProvider } from '@/context/CognitoUserContext';
 import Layout from '@/components/Layout';
 import { pageSettings } from '@/pageSettings';
-import Script from 'next/script';
 
 type WithLayoutSettings = {
   showBanner?: boolean;
