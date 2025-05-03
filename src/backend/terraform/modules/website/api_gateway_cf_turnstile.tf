@@ -48,7 +48,7 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
 #TEMP
 resource "aws_cloudwatch_log_group" "cf_turnstile_api_logs" {
   name              = "/aws/apigateway/${var.environment}-turnstile-access"
-  retention_in_days = 2
+  retention_in_days = 1
 }
 
 resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
