@@ -154,8 +154,7 @@ export default function SignUpModal({
         onClose();
         // handle redirect with possible qs path
         const redirectQuery = router.query.redirect;
-        let redirectPath: string;
-        redirectPath = Array.isArray(redirectQuery) ?
+        const redirectPath = Array.isArray(redirectQuery) ?
           redirectQuery[0] || '/start' :
           '/start';
         router.push(redirectPath);
