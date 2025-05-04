@@ -20,7 +20,8 @@ export default function SignUpModal({
   onClose: () => void;
   createdUser?: boolean;
 }) {
-  const [tab, setTab] = useState<Tab>("signIn") //useState<Tab>(createdUser ? "signIn" : "signUp");
+  console.log(`TODO fix: createdUser: ${createdUser}`);
+  const [tab, setTab] = useState<Tab>("signIn"); //useState<Tab>(createdUser ? "signIn" : "signUp");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [tosAccepted, setTosAccepted] = useState(false);
