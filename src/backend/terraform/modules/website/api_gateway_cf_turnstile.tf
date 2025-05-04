@@ -36,11 +36,11 @@ resource "aws_apigatewayv2_route" "cf_turnstile_root_route" {
   target    = "integrations/${aws_apigatewayv2_integration.cf_turnstile_lambda_integration.id}"
 }
 
-resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
-  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
-  name        = "$default"
-  auto_deploy = true
-}
+# resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+#   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+#   name        = "$default"
+#   auto_deploy = true
+# }
 
 resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   statement_id  = "AllowAPIGatewayInvoke"
@@ -78,27 +78,32 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
 #   })
 # }
 
-# resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
-#   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
-#   name        = "$default"
-#   auto_deploy = true
+resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
+  api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
+  name        = "$default"
+  auto_deploy = true
 
-#   access_log_settings {
-#     destination_arn = aws_cloudwatch_log_group.cf_turnstile_api_logs.arn
+  access_log_settings {
+    destination_arn = ""
+    format = ""
+  }
 
-#     format = jsonencode({
-#       requestId           = "$context.requestId"
-#       ip                  = "$context.identity.sourceIp"
-#       requestTime         = "$context.requestTime"
-#       routeKey            = "$context.routeKey"
-#       status              = "$context.status"
-#       latency             = "$context.responseLatency"
-#       integrationStatus   = "$context.integration.status"
-#       integrationLatency  = "$context.integration.latency"
-#       errorMessage        = "$context.error.message"
-#     })
-#   }
+  # access_log_settings {
+  #   destination_arn = aws_cloudwatch_log_group.cf_turnstile_api_logs.arn
 
-#   depends_on = [aws_cloudwatch_log_resource_policy.allow_apigw_logs]
-# }
+  #   format = jsonencode({
+  #     requestId           = "$context.requestId"
+  #     ip                  = "$context.identity.sourceIp"
+  #     requestTime         = "$context.requestTime"
+  #     routeKey            = "$context.routeKey"
+  #     status              = "$context.status"
+  #     latency             = "$context.responseLatency"
+  #     integrationStatus   = "$context.integration.status"
+  #     integrationLatency  = "$context.integration.latency"
+  #     errorMessage        = "$context.error.message"
+  #   })
+  # }
+
+  # depends_on = [aws_cloudwatch_log_resource_policy.allow_apigw_logs]
+}
 
