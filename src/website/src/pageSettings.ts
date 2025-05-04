@@ -1,6 +1,7 @@
 export type PageSettings = {
     showBanner?: boolean;
     showTagline?: boolean;
+    showStartButton?: boolean;
     pageTitle?: string;
     metaDescription?: string;
     layoutVariant?: "full" | "default" | "minimal";
@@ -17,6 +18,7 @@ export type PageSettings = {
     },
     "/start": {
       showBanner: false,
+      showStartButton: false,
       pageTitle: "Start",
       metaDescription: "Start page for WASM bitcoin mining, after logged in.",
       layoutVariant: "minimal",

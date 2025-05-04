@@ -11,6 +11,7 @@ import { pageSettings } from '@/pageSettings';
 type WithLayoutSettings = {
   showBanner?: boolean;
   showTagline?: boolean;
+  showStartButton?: boolean;
 };
 
 type AppWithLayoutProps = AppProps & {
@@ -22,7 +23,10 @@ export default function App({ Component, pageProps }: AppWithLayoutProps) {
   const settings = pageSettings[router.pathname] || {};
   return (
     <CognitoUserProvider>
-      <Layout showBanner={settings.showBanner} showTagline={settings.showTagline}>
+      <Layout showBanner={settings.showBanner}
+              showTagline={settings.showTagline}
+              showStartButton={settings.showStartButton}
+      >
         <div className={`${GeistSans.className} font-sans`}>
             <Component {...pageProps} />
         </div>

@@ -152,7 +152,13 @@ export default function SignUpModal({
       setTimeout(() => {
         resetAll();
         onClose();
-        router.push('/start');
+        // handle redirect with possible qs path
+        const redirectQuery = router.query.redirect;
+        let redirectPath: string;
+        redirectPath = Array.isArray(redirectQuery) ?
+          redirectQuery[0] || '/start' :
+          '/start';
+        router.push(redirectPath);
       }, 600);
     }
   };

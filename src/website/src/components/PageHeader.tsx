@@ -39,7 +39,11 @@ function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) 
   );
 }
 
-export default function PageHeader() {
+type PageHeaderProps = {
+  showStartButton?: boolean;
+} 
+
+export default function PageHeader({ showStartButton = true }: PageHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
   const [createdUser, setCreatedUser] = useState(false);
@@ -92,12 +96,13 @@ export default function PageHeader() {
           {/* Center: Show only one button based on login state (md+) */}
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             {!loading && user ? (
-              <Link
-                href="/start"
-                className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
-              >
-                Start Mining
-              </Link>
+              showStartButton && (
+                <Link
+                  href="/start"
+                  className="noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+                >
+                  Start Mining
+                </Link>)
             ) : !loading ? (
               <button
                 onClick={() => setShowSignUp(true)}
@@ -116,12 +121,14 @@ export default function PageHeader() {
 
             {/* Show Start or Get Started on mobile */}
             {!loading && user ? (
-              <Link
-                href="/start"
-                className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
-              >
-                Start
-              </Link>
+              showStartButton && (
+                <Link
+                  href="/start"
+                  className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-4 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
+                >
+                  Start
+                </Link>
+              )
             ) : !loading ? (
               <button
                 className="md:hidden noselect inline-block bg-gradient-to-br from-[#f7931a] via-[#1a1a2e] to-[#f7931a] text-white font-semibold px-2 py-3 rounded shadow hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow] duration-300 ease-in-out"
@@ -186,13 +193,15 @@ export default function PageHeader() {
               {/* Show Start/Logout or Get Started in mobile menu */}
               {!loading && user ? (
                 <>
-                  <Link
-                    href="/start"
-                    className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Start Mining
-                  </Link>
+                  {showStartButton && (
+                    <Link
+                      href="/start"
+                      className="noselect text-white text-lg font-medium hover:text-[#f7931a] transition-colors"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      Start Mining
+                    </Link>
+                  )}
                   <button
                     onClick={(e) => {
                       setMenuOpen(false);
