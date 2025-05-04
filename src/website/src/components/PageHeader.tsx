@@ -41,14 +41,15 @@ function NavLink({ href, label, show, className = "", ...props }: NavLinkProps) 
 export default function PageHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showSignUp, setShowSignUp] = useState(false);
-  const { user, loading, logout } = useCognitoUser();
   const [createdUser, setCreatedUser] = useState(false);
+  const { user, loading, logout } = useCognitoUser();
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     logout();
   };
 
+  // look at localstorage to see if user has signed up.
   useEffect(() => {
     const syncFlag = () =>
       setCreatedUser(localStorage.getItem("created_user") === "true");
@@ -57,7 +58,6 @@ export default function PageHeader() {
     window.addEventListener("storage", syncFlag);
   
     return () => window.removeEventListener("storage", syncFlag);
-    // the above doesn't work. TOOD fix it.
   }, []);
 
   return (
@@ -128,11 +128,11 @@ export default function PageHeader() {
               </button>
             ) : null}
 
-            {/* Show Log out button on header only if logged in and not on mobile */}
+            {/* Show Log out button on header only if logged in */}
             {!loading && user && (
               <button
                 onClick={handleLogout}
-                className="md:hidden noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out"
+                className="noselect text-white font-medium hover:text-[#f7931a] hover:scale-105 active:scale-95 hover:shadow-lg active:shadow-sm transition-[transform,box-shadow,colors] duration-300 ease-in-out"
               >
                 Log out
               </button>

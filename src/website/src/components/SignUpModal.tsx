@@ -20,14 +20,17 @@ export default function SignUpModal({
   onClose: () => void;
   createdUser?: boolean;
 }) {
-  console.log(`TODO fix: createdUser: ${createdUser}`);
-  const [tab, setTab] = useState<Tab>("signIn"); //useState<Tab>(createdUser ? "signIn" : "signUp");
+  const [tab, setTab] = useState<Tab>("signUp");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [tosAccepted, setTosAccepted] = useState(false);
   const [otp, setOtp] = useState("");
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(()=>{
+    setTab(createdUser ? "signIn" : "signUp");
+  }, [createdUser]);
 
   // Cognito
   const {
