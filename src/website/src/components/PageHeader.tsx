@@ -57,6 +57,7 @@ export default function PageHeader() {
     window.addEventListener("storage", syncFlag);
   
     return () => window.removeEventListener("storage", syncFlag);
+    // the above doesn't work. TOOD fix it.
   }, []);
 
   return (
