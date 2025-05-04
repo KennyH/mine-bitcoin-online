@@ -200,7 +200,7 @@ export default function SignUpModal({
               <label className="text-sm font-medium">
                 Name
                 <input
-                  className="p-2 rounded bg-[#23233a] text-white w-full"
+                  className="p-2 rounded bg-[#23233a] text-white w-full text-lg"
                   required
                   disabled={isLoading}
                   value={name}
@@ -211,7 +211,7 @@ export default function SignUpModal({
               <label className="text-sm font-medium">
                 Email
                 <input
-                  className="p-2 rounded bg-[#23233a] text-white w-full"
+                  className="p-2 rounded bg-[#23233a] text-white w-full text-lg"
                   type="email"
                   required
                   disabled={isLoading}
@@ -289,7 +289,7 @@ export default function SignUpModal({
               <label className="text-sm font-medium">
                 Email
                 <input
-                  className="p-2 rounded bg-[#23233a] text-white w-full"
+                  className="p-2 rounded bg-[#23233a] text-white w-full text-lg"
                   type="email"
                   required
                   disabled={isLoading}
@@ -366,7 +366,7 @@ export default function SignUpModal({
               disabled={cognitoLoading}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="p-2 rounded bg-[#23233a] text-white w-full text-base"
+              className="p-2 rounded bg-[#23233a] text-white w-full text-lg"
               autoFocus
             />
           </label>
