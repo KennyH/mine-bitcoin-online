@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
-import { Turnstile } from "next-turnstile";
-import Modal from "./Modal";
-import { useCognitoCustomAuth } from "@/hooks/useCognitoCustomAuth";
-import { useCognitoUser } from "@/context/CognitoUserContext";
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { Turnstile } from 'next-turnstile';
+import { useRouter } from 'next/router';
+import Modal from './Modal';
+import { useCognitoCustomAuth } from '@/hooks/useCognitoCustomAuth';
+import { useCognitoUser } from '@/context/CognitoUserContext';
 
 type Tab = "signIn" | "signUp";
 
@@ -27,6 +28,7 @@ export default function SignUpModal({
   const [otp, setOtp] = useState("");
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   useEffect(()=>{
     setTab(createdUser ? "signIn" : "signUp");
@@ -146,9 +148,11 @@ export default function SignUpModal({
         accessToken: auth.AccessToken!,
         refreshToken: auth.RefreshToken!,
       });
+
       setTimeout(() => {
         resetAll();
         onClose();
+        router.push('/start');
       }, 600);
     }
   };
@@ -225,7 +229,7 @@ export default function SignUpModal({
                 />
                 <span>
                   I agree to the{" "}
-                  <a href="/terms" className="underline" target="_blank">
+                  <a href="/tos" className="underline" target="_blank">
                     Terms of Service
                   </a>
                 </span>
@@ -362,7 +366,8 @@ export default function SignUpModal({
               disabled={cognitoLoading}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="p-2 rounded bg-[#23233a] text-white w-full"
+              className="p-2 rounded bg-[#23233a] text-white w-full text-base"
+              autoFocus
             />
           </label>
           <button

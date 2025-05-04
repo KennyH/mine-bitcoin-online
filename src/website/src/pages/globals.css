@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 /* Responsive design is handled by Tailwind's media queries in the compiled CSS. */
 
 :root {

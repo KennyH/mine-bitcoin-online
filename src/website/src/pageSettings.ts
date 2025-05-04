@@ -15,6 +15,18 @@ export type PageSettings = {
       metaDescription: "Mining Bitcoin with your browser!",
       layoutVariant: "full",
     },
+    "/start": {
+      showBanner: false,
+      pageTitle: "Start",
+      metaDescription: "Start page for WASM bitcoin mining, after logged in.",
+      layoutVariant: "minimal",
+    },
+    "/tos": {
+      showBanner: false,
+      pageTitle: "Terms of Service",
+      metaDescription: "Terms of service documentation for Bitcoin Browser Miner.",
+      layoutVariant: "minimal",
+    },
     "/search": {
       showBanner: false,
       pageTitle: "Search",

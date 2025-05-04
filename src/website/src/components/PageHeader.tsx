@@ -5,6 +5,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaSearch, FaBars, FaTimes } from 'react-icons/fa';
+import { useRouter } from 'next/router';
 import SignUpModal from './SignUpModal';
 import { useCognitoUser } from '@/context/CognitoUserContext';
 
@@ -43,10 +44,12 @@ export default function PageHeader() {
   const [showSignUp, setShowSignUp] = useState(false);
   const [createdUser, setCreatedUser] = useState(false);
   const { user, loading, logout } = useCognitoUser();
+  const router = useRouter();
 
   const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
     logout();
+    router.push('/');
   };
 
   // look at localstorage to see if user has signed up.
