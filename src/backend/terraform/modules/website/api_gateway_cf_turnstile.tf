@@ -56,9 +56,5 @@ resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
   name        = "$default"
   auto_deploy = true
-  access_log_settings {
-    destination_arn = ""
-    format = ""
-  }
 }
 
