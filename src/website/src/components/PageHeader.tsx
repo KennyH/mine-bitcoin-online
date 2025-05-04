@@ -50,9 +50,13 @@ export default function PageHeader() {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    const syncFlag = () =>
       setCreatedUser(localStorage.getItem("created_user") === "true");
-    }
+  
+    syncFlag();
+    window.addEventListener("storage", syncFlag);
+  
+    return () => window.removeEventListener("storage", syncFlag);
   }, []);
 
   return (
