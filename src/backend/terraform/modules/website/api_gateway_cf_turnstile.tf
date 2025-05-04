@@ -57,8 +57,8 @@ resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
   name        = "$default"
   auto_deploy = true
   access_log_settings {
-    destination_arn = null
-    format = null
+    destination_arn = ""
+    format = ""
   }
 }
 
