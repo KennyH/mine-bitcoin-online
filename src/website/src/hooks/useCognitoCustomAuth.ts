@@ -1,3 +1,16 @@
+/**
+ * @fileoverview React hook `useCognitoCustomAuth` for managing a custom
+ * authentication flow with AWS Cognito using the CUSTOM_AUTH flow.
+ *
+ * This hook handles the multi-step process:
+ * 1. Optional user sign-up (`signUp`).
+ * 2. Initiating the custom authentication (`startAuth`), which typically
+ *    triggers an OTP (handled by backend Lambda functions).
+ * 3. Submitting the OTP (`submitOtp`) to complete authentication.
+ *
+ * It manages the UI state (`step`, `loading`, `errorMessage`, `errorCode`)
+ * and provides the necessary functions to interact with the Cognito service.
+ */
 'use client'
 
 import { useState } from 'react';
@@ -7,7 +20,7 @@ import {
   InitiateAuthCommand,
   RespondToAuthChallengeCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
-import { isCognitoError } from "@/utils/cognitoError";
+import { isCognitoError } from '@/utils/cognitoError';
 
 const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
 const CLIENT_ID = process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID!;
@@ -49,7 +62,6 @@ export function useCognitoCustomAuth() {
           ],
         })
       );
-      localStorage.setItem("created_user", "true");
       return true;
     } catch (err: unknown) {
       // user already exists. Do sign-in path
@@ -151,6 +163,7 @@ export function useCognitoCustomAuth() {
         setStep("success");
         setErrorMessage(null);
         setErrorCode("None");
+        localStorage.setItem("created_user", "true");
         return result.AuthenticationResult;
       }
   

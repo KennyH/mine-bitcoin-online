@@ -1,3 +1,17 @@
+/**
+ * @fileoverview Defines a React Context (`LayoutContext`) for managing
+ * layout-related state across the application.
+ *
+ * Exports:
+ * - `LayoutContextType`: The type definition for the context data.
+ * - `LayoutContext`: The React Context object itself, initialized with
+ *   default values.
+ * - `useLayoutContext`: A custom hook for consuming the `LayoutContext`
+ *   in functional components.
+ * - `withLayoutContext`: A Higher-Order Component (HOC) for injecting
+ *   the `LayoutContext` data as a `layout` prop into class or functional
+ *   components.
+ */
 'use client';
 
 import { createContext, useContext } from 'react';

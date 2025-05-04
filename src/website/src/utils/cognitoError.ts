@@ -1,4 +1,13 @@
-import { ServiceException } from "@smithy/smithy-client";
+/**
+ * @fileoverview Utility functions and types for handling AWS Cognito errors.
+ *
+ * Exports:
+ * - `CognitoError`: A type extending AWS SDK's `ServiceException` to potentially
+ *   include challenge-specific error details.
+ * - `isCognitoError`: A type guard function to safely check if an unknown error
+ *   object is likely a Cognito service error.
+ */
+import { ServiceException } from '@smithy/smithy-client';
 
 interface ChallengeErrorData {
   challengeParameters?: { error?: string };

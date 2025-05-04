@@ -1,10 +1,28 @@
-"use client";
+/**
+ * @fileoverview Defines a React Context (`CognitoUserContext`) and Provider
+ * (`CognitoUserProvider`) for managing the authenticated AWS Cognito user's
+ * state throughout the application.
+ *
+ * The Provider handles:
+ * - Storing and retrieving Cognito authentication tokens (ID, Access, Refresh)
+ *   in localStorage.
+ * - Fetching user attributes from Cognito using the access token upon initial
+ *   load or after login.
+ * - Providing the user object, loading state, and `login`/`logout` functions
+ *   to consuming components via the context.
+ *
+ * Exports:
+ * - `CognitoUserProvider`: The context provider component.
+ * - `useCognitoUser`: A custom hook to access the user context data.
+ * - `CognitoUserContextType`: (Implicitly used) Type definition for the context value.
+ */
+'use client';
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   CognitoIdentityProviderClient,
   GetUserCommand,
-} from "@aws-sdk/client-cognito-identity-provider";
+} from '@aws-sdk/client-cognito-identity-provider';
 
 const REGION = process.env.NEXT_PUBLIC_AWS_REGION!;
 
