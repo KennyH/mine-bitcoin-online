@@ -46,12 +46,6 @@ resource "aws_lambda_permission" "api_gateway_invoke_cf_turnstile_lambda" {
   source_arn = "${aws_apigatewayv2_api.cf_turnstile_api.execution_arn}/*/*"
 }
 
-#TEMP - use if logs are needed
-# resource "aws_cloudwatch_log_group" "cf_turnstile_api_logs" {
-#   name              = "/aws/apigateway/${var.environment}-turnstile-access"
-#   retention_in_days = 1
-# }
-
 resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
   name        = "$default"
