@@ -234,7 +234,7 @@ export default function SignUpModal({
                 />
                 <span>
                   I agree to the{" "}
-                  <a href="/tos" className="underline" target="_blank">
+                  <a href="/docs/terms" className="underline" target="_blank">
                     Terms of Service
                   </a>
                 </span>

@@ -23,7 +23,7 @@ export type PageSettings = {
       metaDescription: "Start page for WASM bitcoin mining, after logged in.",
       layoutVariant: "minimal",
     },
-    "/tos": {
+    "/docs/terms": {
       showBanner: false,
       pageTitle: "Terms of Service",
       metaDescription: "Terms of service documentation for Bitcoin Browser Miner.",
