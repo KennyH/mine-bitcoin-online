@@ -85,6 +85,11 @@ resource "aws_cognito_user_pool" "user_pool" {
       If you did not request this code, please ignore this email.
     EOM
   }
+
+  # # Uncomment this to lock down user account creation on dev environment
+  # admin_create_user_config {
+  #   allow_admin_create_user_only = var.environment == "dev"
+  # }
 }
 
 # Cognito User Pool Client (Passwordless)

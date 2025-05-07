@@ -1,4 +1,5 @@
 export type PageSettings = {
+    authRequired?: boolean;
     showBanner?: boolean;
     showTagline?: boolean;
     showStartButton?: boolean;
@@ -17,6 +18,7 @@ export type PageSettings = {
       layoutVariant: "full",
     },
     "/start": {
+      authRequired: true,
       showBanner: false,
       showStartButton: false,
       pageTitle: "Start",
