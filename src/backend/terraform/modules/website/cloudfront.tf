@@ -47,6 +47,9 @@ resource "aws_cloudfront_distribution" "frontend_distribution" {
     min_ttl     = 300     # 5 minutes
     default_ttl = 3600    # 1 hour
     max_ttl     = 86400   # 1 day
+
+    # # TODO: Get back to this when closer to launching prod, as it will help with security XSS stuff.
+    # response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers_policy.id
   }
 
   restrictions {
@@ -77,3 +80,59 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = var.domain_name
   validation_method = "DNS"
 }
+
+# # TODO: Get back to this when closer to launching prod, as it will help with security XSS stuff.
+# resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
+#   name    = "FrontendSecurityHeadersPolicy-${var.environment}-minebitcoinonline"
+#   comment = "Security headers for the frontend CloudFront distribution"
+
+#   security_headers_config {
+#     content_security_policy {
+#       content_security_policy = <<-EOT
+#         default-src 'self';
+#         script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com; # Adjust unsafe-eval, include Cloudflare for Turnstile
+#         style-src 'self' 'unsafe-inline'; # Adjust unsafe-inline
+#         img-src 'self' data: https://*;
+#         connect-src 'self' https://*.amazoncognito.com https://challenges.cloudflare.com ${aws_apigatewayv2_stage.cf_turnstile_default_stage.invoke_url};
+#         font-src 'self';
+#         object-src 'none';
+#         base-uri 'self';
+#         form-action 'self';
+#         frame-ancestors 'none'; # Prevent framing
+#         upgrade-insecure-requests; # Forces HTTPS
+#         block-all-mixed-content; # Prevents mixed content
+#         report-uri ${var.csp_report_uri}; # Optional
+#       EOT
+#       override = true
+#     }
+
+#     xss_protection {
+#       mode     = true
+#       protection = true # Enable protection
+#       block    = true   # Block mode
+#       override = true
+#     }
+
+#     content_type_options {
+#       nosniff = true # Prevents MIME sniffing
+#       override = true
+#     }
+
+#     frame_options {
+#       frame_option = "DENY" # Prevents clickjacking (DENY is stronger than SAMEORIGIN)
+#       override = true
+#     }
+
+#     referrer_policy {
+#       referrer_policy = "strict-origin-when-cross-origin"
+#       override = true
+#     }
+
+#     strict_transport_security {
+#       include_subdomains = true
+#       override           = true
+#       preload            = true
+#       access_control_max_age_sec = 31536000 # 1 year
+#     }
+#   }
+# }
