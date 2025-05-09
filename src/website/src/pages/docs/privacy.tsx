@@ -26,13 +26,19 @@ export default function PrivacyPage() {
           <h1 className="text-3xl font-extrabold tracking-tight">
             Bitcoin Browser Miner – Privacy Policy
           </h1>
-          <p className="text-sm italic text-gray-400">Last updated: May 7, 2025</p>
+          <p className="text-sm italic text-gray-400">Last updated: May 9, 2025</p>
         </header>
 
         {/* 1. Overview */}
         <Section title="1. Overview of the Privacy Policy">
           <p>
             Under Construction. <Outbound href="https://github.com/KennyH/mine-bitcoin-online">GitHub</Outbound>.
+          </p>
+        </Section>
+        <Section title="Third–Party Services">
+          <h3>Cloudflare Turnstile</h3>
+          <p>
+          We use Cloudflare Turnstile to protect our site from bots and abuse. Turnstile may process limited technical information from your browser to determine if you are a real user, but does not set any cookies or track you for advertising or analytics purposes. For more information, see <Outbound href="https://www.cloudflare.com/privacypolicy/">Cloudflare’s privacy policy</Outbound>.
           </p>
         </Section>
 
