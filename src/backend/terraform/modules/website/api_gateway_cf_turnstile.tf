@@ -7,7 +7,7 @@ resource "aws_apigatewayv2_api" "cf_turnstile_api" {
   cors_configuration {
     allow_origins = var.environment == "dev" ? [
       "https://dev-env.bitcoinbrowserminer.com",
-      "http://localhost:3000" # Might also need http://127.0.0.1:3000
+      "http://localhost:3000"
       ] : [
       "https://bitcoinbrowserminer.com"
     ]
@@ -50,5 +50,11 @@ resource "aws_apigatewayv2_stage" "cf_turnstile_default_stage" {
   api_id      = aws_apigatewayv2_api.cf_turnstile_api.id
   name        = "$default"
   auto_deploy = true
+
+  # TODO: maybe check cloudwatch or put an alert there for 429 errors in the future.
+  default_route_settings {
+    throttling_burst_limit = var.turnstile_api_burst_limit
+    throttling_rate_limit  = var.turnstile_api_rate_limit
+  }
 }
 

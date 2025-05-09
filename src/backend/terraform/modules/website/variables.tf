@@ -31,3 +31,15 @@ variable "project_name" {
   type        = string
   default     = "MineBitcoinOnline"
 }
+
+variable "turnstile_api_burst_limit" {
+  description = "The throttling burst limit for the Turnstile verification API Gateway stage."
+  type        = number
+  default     = 10
+}
+
+variable "turnstile_api_rate_limit" {
+  description = "The throttling rate limit (requests per second) for the Turnstile verification API Gateway stage."
+  type        = number
+  default     = 5
+}
