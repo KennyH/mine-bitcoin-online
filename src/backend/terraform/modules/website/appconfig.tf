@@ -70,7 +70,7 @@ resource "aws_appconfig_deployment" "initial_feature_flags_deployment" {
   environment_id          = aws_appconfig_environment.feature_flags_env.environment_id
   configuration_profile_id = aws_appconfig_configuration_profile.feature_flags_profile.configuration_profile_id
   configuration_version   = aws_appconfig_hosted_configuration_version.initial_feature_flags_version.version_number
-  deployment_strategy_id  = aws_appconfig_deployment_strategy.feature_flags_strategy.deployment_strategy_id
+  deployment_strategy_id  = aws_appconfig_deployment_strategy.feature_flags_strategy.id
 
   lifecycle {
     ignore_changes = [configuration_version] # stop tf from re-deploying, if just the version changes
