@@ -152,3 +152,12 @@ crash.log
 
 # Ignore test results
 **/test-results/
+
+# Ignore compiled Python bytecode
+__pycache__/
+*.pyc
+
+# Ignore Python virtual environments
+.venv/
+venv/
+env/
