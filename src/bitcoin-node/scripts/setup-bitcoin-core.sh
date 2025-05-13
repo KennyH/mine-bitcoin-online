@@ -10,6 +10,7 @@ This script installs and configures Bitcoin Core on your system for
 Mainnet, Testnet, and/or Regtest.
 It is idempotent and can be run multiple times without overwriting existing
 configuration or service files, unless the --force flag is used.
+It also installs necessary AWS tools, SQLite, and dependencies.
 
 Options:
   --mainnet      Install and configure a mainnet Bitcoin node (default if no flag given and no other network specified)
@@ -63,15 +64,17 @@ USER_HOME=$(eval echo ~${SUDO_USER:-$USER})
 BITCOIN_USER=${SUDO_USER:-$USER}
 BITCOIN_MAINNET_DIR="$USER_HOME/.bitcoin"
 BITCOIN_TESTNET_DIR="$USER_HOME/.bitcoin-testnet"
-BITCOIN_REGTEST_DIR="$USER_HOME/.bitcoin-regtest" # New Regtest directory
+BITCOIN_REGTEST_DIR="$USER_HOME/.bitcoin-regtest"
 BITCOIN_BIN_DIR="/usr/local/bin"
-BITCOIN_TARBALL="bitcoin-${BITCOIN_VERSION}-aarch64-linux-gnu.tar.gz" # Assuming aarch64 for RPi 5
+BITCOIN_TARBALL="bitcoin-${BITCOIN_VERSION}-aarch64-linux-gnu.tar.gz" # aarch64 for RPi 5
 BITCOIN_URL="https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/${BITCOIN_TARBALL}"
+AWS_CLI_INSTALLER="awscliv2.zip"
+AWS_CLI_URL="https://awscli.amazonaws.com/awscliv2.zip"
 
 # --- Prerequisites ---
 echo "Ensuring prerequisites are installed..."
 sudo apt update
-sudo apt install -y git build-essential libtool autotools-dev automake pkg-config libevent-dev bsdmainutils python3 libboost-all-dev libssl-dev libminiupnpc-dev libzmq3-dev wget
+sudo apt install -y git build-essential libtool autotools-dev automake pkg-config libevent-dev bsdmainutils python3 libboost-all-dev libssl-dev libminiupnpc-dev libzmq3-dev wget unzip jq sqlite3
 echo "Prerequisites installed."
 
 # --- Download and Install Bitcoin Core ---
@@ -97,6 +100,22 @@ if [ ! -f "$USER_HOME/$BITCOIN_TARBALL" ] || $FORCE; then
 else
     echo "Bitcoin Core tarball already exists and --force not used. Skipping download/install."
 fi
+
+# --- Download and Install AWS CLI ---
+echo "Downloading and installing AWS CLI..."
+if ! command -v aws &> /dev/null || $FORCE; then
+    cd "$USER_HOME"
+    echo "Downloading AWS CLI installer..."
+    wget -N "$AWS_CLI_URL"
+    echo "Unzipping and installing AWS CLI..."
+    unzip -o "$AWS_CLI_INSTALLER"
+    sudo ./aws/install
+    rm -rf "$USER_HOME/aws" "$USER_HOME/$AWS_CLI_INSTALLER"
+    echo "AWS CLI installed."
+else
+    echo "AWS CLI already installed and --force not used. Skipping download/install."
+fi
+
 
 # --- Function to create config ---
 # Takes network name (mainnet, testnet, regtest) and data directory
@@ -151,7 +170,6 @@ maxconnections=20
 zmqpubrawblock=tcp://127.0.0.1:${ZMQ_BLOCK_PORT}
 zmqpubrawtx=tcp://127.0.0.1:${ZMQ_TX_PORT}
 EOF
-        # Add network specific line
         case "$NETWORK" in
             "testnet") echo "testnet=1" >> "$CONF_FILE" ;;
             "regtest") echo "regtest=1" >> "$CONF_FILE" ;;
@@ -224,7 +242,7 @@ EOF"
         sudo systemctl restart "$SERVICE_NAME"
         echo "$SERVICE_NAME restarted. Waiting 10 seconds for daemon start..."
         sleep 10
-        # Check service status (optional but helpful)
+        # Check service status
         # sudo systemctl status "$SERVICE_NAME" --no-pager
     else
         echo "Systemd service for $NETWORK already exists at $SERVICE_FILE and --force not used. Skipping service creation."
@@ -274,6 +292,7 @@ fi
 
 echo "=========================================================="
 echo "[x] Bitcoin Core Node installation and configuration is complete!"
+echo "[x] Necessary AWS tools (AWS CLI, jq) and SQLite are also installed."
 echo "Selected networks:"
 if $INSTALL_MAINNET; then
     echo "[x] Mainnet"
@@ -295,4 +314,5 @@ if $INSTALL_REGTEST; then
 fi
 echo "[!] IMPORTANT: Securely store your RPC password(s) outputted during config creation."
 echo "[!] BACKUP your wallet and important node data regularly."
+echo "[!] Next Steps: Configure AWS IoT Core for device authentication and credential provisioning."
 echo "=========================================================="
