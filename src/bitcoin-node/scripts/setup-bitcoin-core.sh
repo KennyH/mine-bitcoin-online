@@ -68,8 +68,8 @@ BITCOIN_REGTEST_DIR="$USER_HOME/.bitcoin-regtest"
 BITCOIN_BIN_DIR="/usr/local/bin"
 BITCOIN_TARBALL="bitcoin-${BITCOIN_VERSION}-aarch64-linux-gnu.tar.gz" # aarch64 for RPi 5
 BITCOIN_URL="https://bitcoincore.org/bin/bitcoin-core-${BITCOIN_VERSION}/${BITCOIN_TARBALL}"
-AWS_CLI_INSTALLER="awscliv2.zip"
-AWS_CLI_URL="https://awscli.amazonaws.com/awscliv2.zip"
+AWS_CLI_INSTALLER="awscli-exe-linux-aarch64.zip"
+AWS_CLI_URL="https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip"
 
 # --- Prerequisites ---
 echo "Ensuring prerequisites are installed..."
@@ -106,10 +106,25 @@ echo "Downloading and installing AWS CLI..."
 if ! command -v aws &> /dev/null || $FORCE; then
     cd "$USER_HOME"
     echo "Downloading AWS CLI installer..."
-    wget -N "$AWS_CLI_URL"
-    echo "Unzipping and installing AWS CLI..."
+    wget -N -O "$AWS_CLI_INSTALLER" "$AWS_CLI_URL"
+
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to download AWS CLI installer from $AWS_CLI_URL. Exiting."
+        exit 1
+    fi
+
+    echo "Unzipping AWS CLI installer..."
     unzip -o "$AWS_CLI_INSTALLER"
+
+    echo "Running AWS CLI install script..."
     sudo ./aws/install
+
+    if [ $? -ne 0 ]; then
+        echo "Error: AWS CLI installation failed. Exiting."
+        exit 1
+    fi
+
+    echo "Cleaning up AWS CLI installer files..."
     rm -rf "$USER_HOME/aws" "$USER_HOME/$AWS_CLI_INSTALLER"
     echo "AWS CLI installed."
 else
