@@ -16,13 +16,13 @@ output "iot_certificate_pem" {
 
 output "iot_private_key_pem" {
   description = "The PEM encoded IoT private key."
-  value       = aws_iot_certificate.pi_node_cert.private_key_pem
+  value       = aws_iot_certificate.pi_node_cert.private_key
   sensitive   = true # Mark as sensitive!
 }
 
 output "iot_role_alias_name" {
   description = "The name of the created IoT Role Alias."
-  value       = aws_iot_role_alias.pi_node_role_alias.name
+  value       = aws_iot_role_alias.pi_node_role_alias.alias
 }
 
 output "iot_assumed_role_arn" {
