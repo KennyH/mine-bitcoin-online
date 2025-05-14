@@ -11,7 +11,7 @@ resource "aws_iot_thing" "pi_node" {
 
   attributes = {
     environment = var.environment
-    device_type = "Raspberry Pi 5"
+    device_type = "Raspberry-Pi-5-8GB-2TBnvme"
   }
 }
 
