@@ -15,3 +15,8 @@ variable "turnstile_secret_key" {
   type = string
   sensitive   = true
 }
+
+variable "pool_payout_address" {
+  type = string
+  default = "TODO"
+}

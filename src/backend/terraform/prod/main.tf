@@ -19,3 +19,11 @@ module "website" {
     aws.acm = aws.useast1
   }
 }
+
+module "btcnode" {
+  source        = "../modules/btcnode"
+  environment   = var.environment
+  aws_region    = var.aws_region
+  pi_thing_name = "piBtcNode" 
+  pool_payout_address = var.pool_payout_address # Pass this from the root variables
+}
