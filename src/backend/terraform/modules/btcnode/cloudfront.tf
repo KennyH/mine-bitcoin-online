@@ -5,34 +5,6 @@ resource "aws_cloudfront_origin_access_control" "template_bucket_oac" {
   signing_protocol                  = "sigv4"
 }
 
-resource "aws_s3_bucket_policy" "template_bucket_policy" {
-  bucket = aws_s3_bucket.template_bucket.id
-  policy = data.aws_iam_policy_document.cloudfront_s3_access.json
-}
-
-data "aws_iam_policy_document" "cloudfront_s3_access" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
-    }
-
-    actions = ["s3:GetObject"]
-
-    resources = [
-      "${aws_s3_bucket.template_bucket.arn}/*"
-    ]
-
-    condition {
-       test     = "StringEquals"
-       variable = "AWS:SourceArn"
-       values   = [aws_cloudfront_origin_access_control.template_bucket_oac.arn]
-    }
-  }
-}
-
 resource "aws_cloudfront_distribution" "template_distribution" {
   origin {
     domain_name = aws_s3_bucket.template_bucket.bucket_regional_domain_name
