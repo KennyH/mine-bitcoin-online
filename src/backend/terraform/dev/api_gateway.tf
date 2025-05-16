@@ -192,6 +192,15 @@ resource "aws_api_gateway_stage" "dev_stage" {
   stage_name    = "dev"
 }
 
+resource "aws_lambda_permission" "api_gateway_invoke_lambda" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.vulnerability_mvp_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_api_gateway_rest_api.vulnerability_api.execution_arn}/*/*"
+}
+
 output "invoke_url" {
   description = "The invoke URL for the API Gateway stage"
   value       = "${aws_api_gateway_stage.dev_stage.invoke_url}/${aws_api_gateway_resource.demo_resource.path_part}"
