@@ -68,7 +68,6 @@ def process_single_prompt(system_prompt, user_prompt, filename, client):
         # Attempt to parse the JSON response
         try:
             result_json = json.loads(result_content)
-            # **NEW:** Return the entire parsed JSON object
             return {filename: result_json}
         except json.JSONDecodeError:
             print(f"Error decoding JSON response for {filename}: {result_content}")
