@@ -62,7 +62,7 @@ resource "aws_lambda_function" "vulnerability_lambda" {
 
   # Use your arn from uploading (see comment below)
   layers = [
-    "arn:aws:lambda:us-west-2:916175830325:layer:openai-python311:1" # Hardcoded Layer Version ARN
+    "arn:aws:lambda:us-west-2:916175830325:layer:openai-python311:2" # Hardcoded Layer Version ARN
   ]
 }
 
@@ -75,10 +75,13 @@ resource "aws_cloudwatch_log_group" "lambda_log_group" {
 # docker run --rm -it -v $PWD/layer:/var/task \
 #   public.ecr.aws/sam/build-python3.11:latest \
 #   /bin/bash -c "
-#       pip install 'openai==1.*' -t python && \
-#       cd python && zip -r ../openai-layer.zip ."
+#       pip install 'openai==1.*' -t /var/task/python/lib/python3.11/site-packages && \
+#       # Set read permissions for owner, group, and others recursively
+#       chmod -R 755 /var/task/python && \
+#       cd /var/task && zip -r /var/task/openai-layer.zip python"
 # # # publish it
 # aws lambda publish-layer-version \
 #   --layer-name openai-python311 \
 #   --zip-file fileb://layer/openai-layer.zip \
 #   --compatible-runtimes python3.11
+#   --compatible-architectures x86_64
