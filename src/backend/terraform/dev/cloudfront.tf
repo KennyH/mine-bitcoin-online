@@ -66,7 +66,7 @@ resource "aws_s3_bucket_policy" "allow_cloudfront_oac" {
         Resource  = "${aws_s3_bucket.demo_website_bucket.arn}/*",
         Condition = {
           StringEquals = {
-            "Cloudfront-Viewer-Certificate-Issuer-DN" = aws_cloudfront_origin_access_control.oac.cloudfront_access_identity_path
+            "AWS:SourceArn" = aws_cloudfront_distribution.s3_distribution.arn
           }
         }
       }
