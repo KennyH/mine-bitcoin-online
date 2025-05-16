@@ -35,6 +35,24 @@ resource "aws_api_gateway_integration" "lambda_integration" {
   uri                     = aws_lambda_function.vulnerability_lambda.invoke_arn
 }
 
+# Create a POST method for the resource
+resource "aws_api_gateway_method" "demo_method_post" {
+  rest_api_id   = aws_api_gateway_rest_api.vulnerability_api.id
+  resource_id   = aws_api_gateway_resource.demo_resource.id
+  http_method   = "POST" # Define the POST method
+  authorization = "NONE"
+}
+
+# Set up the integration between the POST method and the Lambda function
+resource "aws_api_gateway_integration" "lambda_integration_post" {
+  rest_api_id             = aws_api_gateway_rest_api.vulnerability_api.id
+  resource_id             = aws_api_gateway_resource.demo_resource.id
+  http_method             = aws_api_gateway_method.demo_method_post.http_method
+  integration_http_method = "POST" # Lambda integrations still use POST
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.vulnerability_lambda.invoke_arn
+}
+
 # Deploy the API Gateway
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.vulnerability_api.id
@@ -44,6 +62,8 @@ resource "aws_api_gateway_deployment" "api_deployment" {
       aws_api_gateway_resource.demo_resource.id,
       aws_api_gateway_method.demo_method.id,
       aws_api_gateway_integration.lambda_integration.id,
+      aws_api_gateway_method.demo_method_post.id,
+      aws_api_gateway_integration.lambda_integration_post.id,
     ]))
   }
 

@@ -7,6 +7,7 @@ def lambda_handler(event, context):
     prompts_content = {}
     prompts_dir = os.path.join(os.path.dirname(__file__), "prompts")
 
+    # Read content of each prompt file (existing logic)
     if os.path.exists(prompts_dir):
         for filename in os.listdir(prompts_dir):
             if filename.endswith(".txt"):
@@ -16,10 +17,21 @@ def lambda_handler(event, context):
     else:
         print("Prompts directory not found!")
 
+    message_text = None
+    if event.get('httpMethod') == 'POST' and event.get('body'):
+        try:
+            request_body = json.loads(event['body'])
+            message_text = request_body.get('message_text')
+            print(f"Received message_text: {message_text}")
+        except json.JSONDecodeError:
+            print("Failed to decode JSON body")
+
+    # Basic response for the demo, including prompt content and received message_text
     response_body = {
         "message": "Hello from your Vulnerability MVP Lambda!",
-        "input": event,
-        "prompts_loaded": prompts_content
+        "input_event": event, # Include the full event for debugging
+        "prompts_loaded": prompts_content,
+        "received_message_text": message_text # Include the extracted message_text
     }
 
     return {
