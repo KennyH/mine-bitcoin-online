@@ -5,6 +5,7 @@ resource "aws_s3_bucket" "demo_website_bucket" {
     Environment = "Demo"
     Project     = "VulnerabilityMVP"
   }
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_website_configuration" "demo_website_config" {
