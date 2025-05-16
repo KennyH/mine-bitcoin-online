@@ -35,6 +35,14 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
   policy_arn = aws_iam_policy.lambda_logging_policy.arn
 }
 
+resource "aws_lambda_permission" "api_gateway_invoke_lambda" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.vulnerability_mvp_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn = "${aws_api_gateway_rest_api.vulnerability_api.execution_arn}/*/*"
+}
+
 # Zip up the Lambda function code
 data "archive_file" "lambda_zip" {
   type        = "zip"
@@ -62,7 +70,7 @@ resource "aws_lambda_function" "vulnerability_lambda" {
 
   # Use your arn from uploading (see comment below)
   layers = [
-    "arn:aws:lambda:us-west-2:916175830325:layer:openai-python311:2" # Hardcoded Layer Version ARN
+    "arn:aws:lambda:us-west-2:916175830325:layer:openai-python311:4" # Hardcoded Layer Version ARN
   ]
 }
 
