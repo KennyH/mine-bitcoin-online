@@ -39,6 +39,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "../lambda"
+  #  source_dir  = "./terraform/lambda"
   output_path = "vulnerability_lambda.zip"
 }
 
@@ -52,9 +53,32 @@ resource "aws_lambda_function" "vulnerability_lambda" {
   filename         = data.archive_file.lambda_zip.output_path
 
   timeout = 60
+
+  environment {
+    variables = {
+      OPENAI_API_KEY = "YOUR_OPENAI_API_KEY" # Replace with your actual key or use a secure method
+    }
+  }
+
+  # Use your arn from uploading (see comment below)
+  layers = [
+    "arn:aws:lambda:us-west-2:916175830325:layer:openai-python311:1" # Hardcoded Layer Version ARN
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "lambda_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.vulnerability_lambda.function_name}"
   retention_in_days = 3 # Set to 3 days
 }
+
+# # Run these commands to build and upload a recent OpenAI Lambda Layer:
+# docker run --rm -it -v $PWD/layer:/var/task \
+#   public.ecr.aws/sam/build-python3.11:latest \
+#   /bin/bash -c "
+#       pip install 'openai==1.*' -t python && \
+#       cd python && zip -r ../openai-layer.zip ."
+# # # publish it
+# aws lambda publish-layer-version \
+#   --layer-name openai-python311 \
+#   --zip-file fileb://layer/openai-layer.zip \
+#   --compatible-runtimes python3.11
