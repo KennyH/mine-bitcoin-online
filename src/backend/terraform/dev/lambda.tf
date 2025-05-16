@@ -38,7 +38,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attach" {
 # Zip up the Lambda function code
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_dir  = "./terraform/lambda"
+  source_dir  = "../lambda"
   output_path = "vulnerability_lambda.zip"
 }
 
