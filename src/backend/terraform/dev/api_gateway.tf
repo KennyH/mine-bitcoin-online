@@ -195,7 +195,7 @@ resource "aws_api_gateway_stage" "dev_stage" {
 resource "aws_lambda_permission" "api_gateway_invoke_lambda_demo" {
   statement_id  = "AllowVulnerabilityAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.vulnerability_mvp_lambda.function_name
+  function_name = aws_lambda_function.vulnerability_lambda.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_api_gateway_rest_api.vulnerability_api.execution_arn}/*/*"
