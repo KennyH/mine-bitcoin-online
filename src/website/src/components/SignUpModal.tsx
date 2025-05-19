@@ -162,6 +162,19 @@ export default function SignUpModal({
     }
   };
 
+  const handleOtpInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setOtp(value);
+
+    // Check if the input has exactly 6 characters
+    if (value.length === 6) {
+      const syntheticEvent = {
+        preventDefault: () => {},
+      } as React.FormEvent;
+      handleOtp(syntheticEvent);
+    }
+  };
+
   const isLoading = cognitoLoading || isVerifyingTurnstile;
   const btnDisabled = (extra = false) =>
     isLoading ||
@@ -370,14 +383,14 @@ export default function SignUpModal({
               required
               disabled={cognitoLoading}
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={handleOtpInputChange}
               className="p-2 rounded bg-[#23233a] text-white w-full text-lg"
               autoFocus
             />
           </label>
           <button
             type="submit"
-            disabled={cognitoLoading}
+            disabled={cognitoLoading || otp.length !== 6}
             className="bg-[#f7931a] text-white font-semibold py-2 rounded disabled:opacity-50"
           >
             {cognitoLoading ? "Verifying..." : "Verify"}
