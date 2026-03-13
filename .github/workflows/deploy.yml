@@ -1,151 +1,169 @@
 ---
-name: Deploy Terraform & Next to AWS
-
-on:
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        default: 'dev'
-        type: choice
-        options:
-          - dev # maps to main branch
-          - prod # maps to prod branch
-
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-    
-      - name: Set uppercase environment variable
-        id: vars
-        run: |
-          env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
-          echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
-          echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
-          aws-region: us-west-2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.4
-
-      - name: Terraform Init
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        run: terraform init
+  name: Deploy Terraform & Next to AWS
+  
+  on:
+    workflow_dispatch:
+      inputs:
+        environment:
+          description: 'Environment to deploy'
+          required: true
+          default: 'dev'
+          type: choice
+          options:
+            - dev # maps to main branch
+            - prod # maps to prod branch
+        deploy_target:
+          description: 'What to deploy'
+          required: true
+          default: 'website'
+          type: choice
+          options:
+            - both
+            - terraform
+            - website
+  
+  jobs:
+    terraform:
+      # Only run if 'both' or 'terraform' is selected
+      if: inputs.deploy_target == 'both' || inputs.deploy_target == 'terraform'
+      runs-on: ubuntu-latest
+  
+      permissions:
+        id-token: write
+        contents: read
+  
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
       
-      # # TEMPORARY: Destroy the Cognito User Pool resource
-      # - name: Terraform Destroy Cognito User Pool (TEMPORARY)
-      #   working-directory: src/backend/terraform/${{ inputs.environment }}
-      #   run: terraform destroy -auto-approve -target=module.btcminer_backend.aws_cognito_user_pool.user_pool
-
-      # # TEMPORARY: used for addinf stuff to state
-      # - name: Terraform Import
-      #   working-directory: src/backend/terraform/${{ inputs.environment }}
-      #   run: terraform import 'module.website.aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
-
-      - name: Terraform Plan
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        env:
-          TF_VAR_environment: ${{ inputs.environment }}
-          TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
-          TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
-        run: terraform plan
-
-      - name: Terraform Apply
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        env:
-          TF_VAR_environment: ${{ inputs.environment }}
-          TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
-          TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
-        run: terraform apply -auto-approve
-
-  deploy-nextjs:
-    runs-on: ubuntu-latest
-    needs: terraform
-
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
-          aws-region: us-west-2
-      
-      - name: Set uppercase environment variable
-        id: vars
-        run: |
-          env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
-          echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
-          echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
-
-      - name: Setup Node.js (Latest LTS)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        working-directory: src/website
-        run: npm ci
-
-      - name: Build Next.js static site
-        working-directory: src/website
-        env:
-          NEXT_PUBLIC_NEXTAUTH_URL: ${{ secrets[format('{0}_NEXT_PUBLIC_NEXTAUTH_URL', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_AWS_REGION: ${{ secrets[format('{0}_NEXT_PUBLIC_AWS_REGION', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_SITE_KEY', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT', steps.vars.outputs.env_upper)] }}
-          NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
-          NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
-        run: |
-          npm run build
-          if [ "${{ inputs.environment }}" = "prod" ]; then
-            npm run postbuild
-          fi
-
-      - name: Deploy to S3 bucket
-        run: |
-           aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
-
-          #  TODO: Uncomment when close to launching prod
-          #  # Step 1: Upload HTML with short cache
-          #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
-          #    --exclude "*" \
-          #    --include "*.html" \
-          #    --cache-control "public, max-age=60" \
-          #    --delete
-
-          #  # Step 2: Upload other assets with long cache
-          #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
-          #    --exclude "*.html" \
-          #    --cache-control "public, max-age=31536000, immutable"
-
-      - name: Invalidate CloudFront Distribution
-        run: |
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
-            --query "DistributionList.Items[?Origins.Items[?contains(DomainName, 'mine-bitcoin-online-frontend-${{ inputs.environment }}')]].Id | [0]" \
-            --output text)
-
-          aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
+        - name: Set uppercase environment variable
+          id: vars
+          run: |
+            env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
+            echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
+            echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
+  
+        - name: Configure AWS credentials (OIDC)
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
+            aws-region: us-west-2
+  
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+          with:
+            terraform_version: 1.7.4
+  
+        - name: Terraform Init
+          working-directory: src/backend/terraform/${{ inputs.environment }}
+          run: terraform init
+        
+        # # TEMPORARY: Destroy the Cognito User Pool resource
+        # - name: Terraform Destroy Cognito User Pool (TEMPORARY)
+        #   working-directory: src/backend/terraform/${{ inputs.environment }}
+        #   run: terraform destroy -auto-approve -target=module.btcminer_backend.aws_cognito_user_pool.user_pool
+  
+        # # TEMPORARY: used for addinf stuff to state
+        # - name: Terraform Import
+        #   working-directory: src/backend/terraform/${{ inputs.environment }}
+        #   run: terraform import 'module.website.aws_cloudwatch_log_group.cognito_custom_auth_lambda_log_group' '/aws/lambda/dev-mine-bitcoin-online-cognito-custom-auth-lambda'
+  
+        - name: Terraform Plan
+          working-directory: src/backend/terraform/${{ inputs.environment }}
+          env:
+            TF_VAR_environment: ${{ inputs.environment }}
+            TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
+            TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
+          run: terraform plan
+  
+        - name: Terraform Apply
+          working-directory: src/backend/terraform/${{ inputs.environment }}
+          env:
+            TF_VAR_environment: ${{ inputs.environment }}
+            TF_VAR_domain_name: ${{ inputs.environment == 'dev' && 'dev-env.bitcoinbrowserminer.com' || 'bitcoinbrowserminer.com' }}
+            TF_VAR_turnstile_secret_key: ${{ secrets[format('{0}_TERRAFORM_TURNSTILE_SECRET_KEY', steps.vars.outputs.env_upper)] }}
+          run: terraform apply -auto-approve
+  
+    deploy-nextjs:
+      # Only run if 'both' or 'website' is selected. 
+      # Use always() and evaluate needs.terraform so it still runs if terraform was successfully skipped,
+      # but still halts if terraform was run and failed.
+      if: >-
+        always() && 
+        (needs.terraform.result == 'success' || needs.terraform.result == 'skipped') &&
+        (inputs.deploy_target == 'both' || inputs.deploy_target == 'website')
+      runs-on: ubuntu-latest
+      needs: terraform
+  
+      permissions:
+        id-token: write
+        contents: read
+  
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+  
+        - name: Configure AWS credentials (OIDC)
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
+            aws-region: us-west-2
+        
+        - name: Set uppercase environment variable
+          id: vars
+          run: |
+            env_upper=$(echo "${{ inputs.environment }}" | tr '[:lower:]' '[:upper:]')
+            echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
+            echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
+  
+        - name: Setup Node.js (Latest LTS)
+          uses: actions/setup-node@v4
+          with:
+            node-version: 22
+  
+        - name: Install dependencies
+          working-directory: src/website
+          run: npm ci
+  
+        - name: Build Next.js static site
+          working-directory: src/website
+          env:
+            NEXT_PUBLIC_NEXTAUTH_URL: ${{ secrets[format('{0}_NEXT_PUBLIC_NEXTAUTH_URL', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_CLIENT_ID', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_USER_POOL_ID', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_COGNITO_DOMAIN: ${{ secrets[format('{0}_NEXT_PUBLIC_COGNITO_DOMAIN', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_AWS_REGION: ${{ secrets[format('{0}_NEXT_PUBLIC_AWS_REGION', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_SITE_KEY', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT: ${{ secrets[format('{0}_NEXT_PUBLIC_TURNSTILE_VERIFICATION_ENDPOINT', steps.vars.outputs.env_upper)] }}
+            NEXT_PUBLIC_SITE_URL: ${{ inputs.environment == 'dev' && 'https://dev-env.bitcoinbrowserminer.com' || 'https://bitcoinbrowserminer.com' }}
+            NEXT_PUBLIC_ENVIRONMENT: ${{ inputs.environment }}
+          run: |
+            npm run build
+            if [ "${{ inputs.environment }}" = "prod" ]; then
+              npm run postbuild
+            fi
+  
+        - name: Deploy to S3 bucket
+          run: |
+             aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} --delete
+  
+            #  TODO: Uncomment when close to launching prod
+            #  # Step 1: Upload HTML with short cache
+            #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
+            #    --exclude "*" \
+            #    --include "*.html" \
+            #    --cache-control "public, max-age=60" \
+            #    --delete
+  
+            #  # Step 2: Upload other assets with long cache
+            #  aws s3 sync ./src/website/out s3://mine-bitcoin-online-frontend-${{ inputs.environment }} \
+            #    --exclude "*.html" \
+            #    --cache-control "public, max-age=31536000, immutable"
+  
+        - name: Invalidate CloudFront Distribution
+          run: |
+            DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+              --query "DistributionList.Items[?Origins.Items[?contains(DomainName, 'mine-bitcoin-online-frontend-${{ inputs.environment }}')]].Id | [0]" \
+              --output text)
+  
+            aws cloudfront create-invalidation --distribution-id "$DISTRIBUTION_ID" --paths "/*"
