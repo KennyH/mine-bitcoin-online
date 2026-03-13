@@ -1,0 +1,30 @@
+# *
+User-agent: *
+Disallow: /
+
+# GPTBot
+User-agent: GPTBot
+Disallow: /
+
+# ChatGPT-User
+User-agent: ChatGPT-User
+Disallow: /
+
+# Googlebot
+User-agent: Googlebot
+Disallow: /
+
+# Bingbot
+User-agent: Bingbot
+Disallow: /
+
+# anthropic-ai
+User-agent: anthropic-ai
+Disallow: /
+
+# ClaudeBot
+User-agent: ClaudeBot
+Disallow: /
+
+# Host
+Host: https://dev-env.bitcoinbrowserminer.com
