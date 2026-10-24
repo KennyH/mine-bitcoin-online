@@ -34,7 +34,7 @@
   
       steps:
         - name: Checkout Repo
-          uses: actions/checkout@v4
+          uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
       
         - name: Set uppercase environment variable
           id: vars
@@ -44,13 +44,13 @@
             echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
   
         - name: Configure AWS credentials (OIDC)
-          uses: aws-actions/configure-aws-credentials@v4
+          uses: aws-actions/configure-aws-credentials@e125382024805c87e792c30a845cfb11a5457cd3 # v6.3.0
           with:
             role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
             aws-region: us-west-2
   
         - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
+          uses: hashicorp/setup-terraform@dfe3c3fd6fde44cc96c5aa04d7328ff969fddf50 # v4.0.1
           with:
             terraform_version: 1.7.4
   
@@ -101,7 +101,7 @@
   
       steps:
         - name: Checkout Repo
-          uses: actions/checkout@v4
+          uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
   
         - name: Configure AWS credentials (OIDC)
           uses: aws-actions/configure-aws-credentials@v4
@@ -116,10 +116,10 @@
             echo "ENV_UPPER=$env_upper" >> "$GITHUB_ENV"
             echo "env_upper=$env_upper" >> "$GITHUB_OUTPUT"
   
-        - name: Setup Node.js (Latest LTS)
-          uses: actions/setup-node@v4
+        - name: Setup Node.js (v26)
+          uses: actions/setup-node@3b0a70f7bb0ff3f2dc5a0e9fcb8dcf205eb0eb13 # v7.0.0
           with:
-            node-version: 22
+            node-version: 26
   
         - name: Install dependencies
           working-directory: src/website

@@ -2,6 +2,10 @@ name: Lint and Terrascan
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "main", "prod" ]
+  pull_request:
+    branches: [ "main", "prod" ]
 
 jobs:
   super-linter:
@@ -11,16 +15,14 @@ jobs:
       statuses: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
         with:
           fetch-depth: 0
 
-      - name: Run Super Linter (slim-latest)
-        uses: docker://ghcr.io/github/super-linter:slim-latest
-        with:
-          entrypoint: /action/lib/linter.sh
+      - name: Run Super Linter
+        # Super-Linter modernized its repository. The docker:// syntax is outdated.
+        uses: super-linter/super-linter/slim@v9.0.0 
         env:
-          RUN_LOCAL: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVASCRIPT_ES: true
@@ -35,17 +37,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
         with:
           fetch-depth: 0
 
-      - name: Run Terrascan scan
-        uses: tenable/terrascan-action@v1.4.1
-        with:
-          iac_type: terraform
-          iac_version: v14
-          policy_type: aws
-          iac_dir: src/backend/terraform
-          #config_path: ./.github/linters/.terrascan.yaml
-          # None of this seems to work...  
-          skip_rules: 'AC_AWS_0032,AC_AWS_0026,AC_AWS_0025'
+      - name: Run Terrascan via Docker
+        # Bypasses the buggy tenable/terrascan-action wrapper and runs the 
+        # official Docker container directly so skip-rules actually works!
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/iac" \
+            -w "/iac" \
+            tenable/terrascan:latest \
+            scan -i terraform -t aws -d src/backend/terraform \
+            --skip-rules="AC_AWS_0032,AC_AWS_0026,AC_AWS_0025"

@@ -1,47 +1,47 @@
 ---
-name: Terraform Force Unlock
-
-on:
-  workflow_dispatch:
-    inputs:
-      lock_id:
-        description: "Terraform Lock ID (to force unlock)"
-        required: true
-        type: string
-      environment:
-        description: 'Environment to unlock (e.g., dev, prod)'
-        required: true
-        type: choice
-        options:
-          - dev # maps to main branch
-          - prod # maps to prod branch
-
-jobs:
-  force-unlock:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-
-      - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
-          aws-region: us-west-2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.7.4
-
-      - name: Terraform Init
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        run: terraform init
-
-      - name: Terraform Force Unlock
-        working-directory: src/backend/terraform/${{ inputs.environment }}
-        run: terraform force-unlock -force ${{ inputs.lock_id }}
+  name: Terraform Force Unlock
+  
+  on:
+    workflow_dispatch:
+      inputs:
+        lock_id:
+          description: "Terraform Lock ID (to force unlock)"
+          required: true
+          type: string
+        environment:
+          description: 'Environment to unlock (e.g., dev, prod)'
+          required: true
+          type: choice
+          options:
+            - dev # maps to main branch
+            - prod # maps to prod branch
+  
+  jobs:
+    force-unlock:
+      runs-on: ubuntu-latest
+      permissions:
+        id-token: write
+        contents: read
+  
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
+  
+        - name: Configure AWS credentials (OIDC)
+          uses: aws-actions/configure-aws-credentials@e125382024805c87e792c30a845cfb11a5457cd3 # v6.3.0
+          with:
+            role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mine-bitcoin-online-github-actions-${{ inputs.environment }}-role
+            aws-region: us-west-2
+  
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@dfe3c3fd6fde44cc96c5aa04d7328ff969fddf50 # v4.0.1
+          with:
+            terraform_version: 1.7.4
+  
+        - name: Terraform Init
+          working-directory: src/backend/terraform/${{ inputs.environment }}
+          run: terraform init
+  
+        - name: Terraform Force Unlock
+          working-directory: src/backend/terraform/${{ inputs.environment }}
+          run: terraform force-unlock -force ${{ inputs.lock_id }}
