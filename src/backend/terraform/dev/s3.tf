@@ -24,3 +24,11 @@ resource "aws_s3_bucket_public_access_block" "public_access_block" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_versioning" "demo_website_versioning" {
+  bucket = aws_s3_bucket.demo_website_bucket.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}

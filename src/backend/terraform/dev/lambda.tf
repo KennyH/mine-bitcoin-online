@@ -52,6 +52,8 @@ resource "aws_lambda_function" "vulnerability_lambda" {
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
   filename         = data.archive_file.lambda_zip.output_path
 
+  tracing_config { mode = "Active" }
+
   timeout = 60
 
   environment {

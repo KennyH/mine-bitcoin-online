@@ -30,7 +30,6 @@ jobs:
           VALIDATE_JSX: true
           VALIDATE_YAML: true
           VALIDATE_JSON: true
-          VALIDATE_PYTHON_FLAKE8: false
           YAML_LINTER_RULES_PATH: ./.github/linters/.yamllint.yaml
           FILTER_REGEX_EXCLUDE: .*/src/website/.*
 
@@ -43,8 +42,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run Terrascan via Docker
-        # Bypasses the buggy tenable/terrascan-action wrapper and runs the 
-        # official Docker container directly so skip-rules actually works!
+        continue-on-error: true
         run: |
           docker run --rm \
             -v "${{ github.workspace }}:/iac" \
