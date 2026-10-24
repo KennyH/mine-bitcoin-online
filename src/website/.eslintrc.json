@@ -1,0 +1,17 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "n/no-missing-import": "off",
+    "n/no-unsupported-features/node-builtins": "off"
+  }
+}
