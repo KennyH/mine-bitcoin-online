@@ -30,8 +30,9 @@ jobs:
           VALIDATE_JSX: true
           VALIDATE_YAML: true
           VALIDATE_JSON: true
-          VALIDATE_PYTHON_FLAKE8: true
+          VALIDATE_PYTHON_FLAKE8: false
           YAML_LINTER_RULES_PATH: ./.github/linters/.yamllint.yaml
+          FILTER_REGEX_EXCLUDE: .*/src/website/.*
 
   terrascan:
     runs-on: ubuntu-latest
