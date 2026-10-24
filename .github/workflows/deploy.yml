@@ -34,7 +34,7 @@
   
       steps:
         - name: Checkout Repo
-          uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
+          uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       
         - name: Set uppercase environment variable
           id: vars
@@ -101,7 +101,7 @@
   
       steps:
         - name: Checkout Repo
-          uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v7.0.1
+          uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
   
         - name: Configure AWS credentials (OIDC)
           uses: aws-actions/configure-aws-credentials@v4
